@@ -56,6 +56,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 osThreadId defaultTaskHandle;
+osThreadId blinkTaskHandle;
+osSemaphoreId semHandle;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -66,6 +68,7 @@ osThreadId defaultTaskHandle;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 void StartDefaultTask(void const * argument);
+void BlinkTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -121,7 +124,12 @@ int main(void)
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+    defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+    osThreadDef(blinkTask, BlinkTask, osPriorityNormal, 0, 128);
+    blinkTaskHandle = osThreadCreate(osThread(blinkTask), NULL);
+    osSemaphoreDef(sem);
+    semHandle = osSemaphoreCreate(osSemaphore(sem), 1);
+    osSemaphoreWait(semHandle, osWaitForever);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -249,16 +257,27 @@ static void MX_GPIO_Init(void)
 /* USER CODE END 4 */
 
 /* StartDefaultTask function */
-void StartDefaultTask(void const * argument)
-{
 
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
+void StartDefaultTask(void const *argument)
+{
+  while(1) {
+	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)) {
+		  osSemaphoreRelease(semHandle);
+		  osThreadTerminate(NULL);
+	  }
   }
-  /* USER CODE END 5 */ 
+}
+
+
+
+void BlinkTask(void const *argument)
+{
+	if(osSemaphoreWait(semHandle, osWaitForever) == osOK) {
+		while(1) {
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			osDelay(500);
+		}
+	}
 }
 
 /**
