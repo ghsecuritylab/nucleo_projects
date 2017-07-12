@@ -2294,13 +2294,13 @@
 		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
 			<provider id="ilg.gnuarmeclipse.managedbuild.cross.GCCBuiltinSpecsDetector">
 				<language id="org.eclipse.cdt.core.gcc">
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/lib/gcc/arm-none-eabi/5.4.1/include">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/lib/gcc/arm-none-eabi/5.4.1/include">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/lib/gcc/arm-none-eabi/5.4.1/include-fixed">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/lib/gcc/arm-none-eabi/5.4.1/include-fixed">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/arm-none-eabi/include">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/arm-none-eabi/include">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
 					<entry kind="macro" name="NDEBUG" value="1">
@@ -3382,22 +3382,22 @@
 					</entry>
 				</language>
 				<language id="org.eclipse.cdt.core.g++">
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/arm-none-eabi/include/c++/5.4.1">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/arm-none-eabi/include/c++/5.4.1">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/arm-none-eabi/include/c++/5.4.1/arm-none-eabi/armv7-m">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/arm-none-eabi/include/c++/5.4.1/arm-none-eabi/armv7-m">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/arm-none-eabi/include/c++/5.4.1/backward">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/arm-none-eabi/include/c++/5.4.1/backward">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/lib/gcc/arm-none-eabi/5.4.1/include">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/lib/gcc/arm-none-eabi/5.4.1/include">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/lib/gcc/arm-none-eabi/5.4.1/include-fixed">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/lib/gcc/arm-none-eabi/5.4.1/include-fixed">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
-					<entry kind="includePath" name="C:/STM32Toolchain/gcc-arm/arm-none-eabi/include">
+					<entry kind="includePath" name="C:/STM32Toolchain/gnu-arm/4.8-2014q3/arm-none-eabi/include">
 						<flag value="BUILTIN|READONLY"/>
 					</entry>
 					<entry kind="macro" name="NDEBUG" value="1">

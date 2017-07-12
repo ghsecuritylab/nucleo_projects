@@ -1,11 +1,23 @@
-16:45:39 **** Incremental Build of configuration Debug for project test1 ****
+14:03:34 **** Incremental Build of configuration Debug for project test1 ****
 make all 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "test1.elf"
-   text	   data	    bss	    dec	    hex	filename
-   7423	    160	    432	   8015	   1f4f	test1.elf
-Finished building: test1.siz
- 
+Building target: test1.elf
+Invoking: Cross ARM GNU C++ Linker
+arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -T mem.ld -T libs.ld -T sections.ld -nostartfiles -Xlinker --gc-sections -L"../ldscripts" -Wl,-Map,"test1.map" --specs=nano.specs -o "test1.elf"  ./system/src/stm32f1xx/stm32f1xx_hal.o ./system/src/stm32f1xx/stm32f1xx_hal_adc.o ./system/src/stm32f1xx/stm32f1xx_hal_adc_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_can.o ./system/src/stm32f1xx/stm32f1xx_hal_cec.o ./system/src/stm32f1xx/stm32f1xx_hal_cortex.o ./system/src/stm32f1xx/stm32f1xx_hal_crc.o ./system/src/stm32f1xx/stm32f1xx_hal_dac.o ./system/src/stm32f1xx/stm32f1xx_hal_dac_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_dma.o ./system/src/stm32f1xx/stm32f1xx_hal_eth.o ./system/src/stm32f1xx/stm32f1xx_hal_flash.o ./system/src/stm32f1xx/stm32f1xx_hal_flash_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_gpio.o ./system/src/stm32f1xx/stm32f1xx_hal_gpio_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_hcd.o ./system/src/stm32f1xx/stm32f1xx_hal_i2c.o ./system/src/stm32f1xx/stm32f1xx_hal_i2s.o ./system/src/stm32f1xx/stm32f1xx_hal_irda.o ./system/src/stm32f1xx/stm32f1xx_hal_iwdg.o ./system/src/stm32f1xx/stm32f1xx_hal_msp_template.o ./system/src/stm32f1xx/stm32f1xx_hal_nand.o ./system/src/stm32f1xx/stm32f1xx_hal_nor.o ./system/src/stm32f1xx/stm32f1xx_hal_pccard.o ./system/src/stm32f1xx/stm32f1xx_hal_pcd.o ./system/src/stm32f1xx/stm32f1xx_hal_pcd_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_pwr.o ./system/src/stm32f1xx/stm32f1xx_hal_rcc.o ./system/src/stm32f1xx/stm32f1xx_hal_rcc_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_rtc.o ./system/src/stm32f1xx/stm32f1xx_hal_rtc_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_sd.o ./system/src/stm32f1xx/stm32f1xx_hal_smartcard.o ./system/src/stm32f1xx/stm32f1xx_hal_spi.o ./system/src/stm32f1xx/stm32f1xx_hal_spi_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_sram.o ./system/src/stm32f1xx/stm32f1xx_hal_tim.o ./system/src/stm32f1xx/stm32f1xx_hal_tim_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_uart.o ./system/src/stm32f1xx/stm32f1xx_hal_usart.o ./system/src/stm32f1xx/stm32f1xx_hal_wwdg.o ./system/src/stm32f1xx/stm32f1xx_ll_fsmc.o ./system/src/stm32f1xx/stm32f1xx_ll_sdmmc.o ./system/src/stm32f1xx/stm32f1xx_ll_usb.o  ./system/src/newlib/_cxx.o ./system/src/newlib/_exit.o ./system/src/newlib/_sbrk.o ./system/src/newlib/_startup.o ./system/src/newlib/_syscalls.o ./system/src/newlib/assert.o  ./system/src/diag/Trace.o ./system/src/diag/trace_impl.o  ./system/src/cortexm/_initialize_hardware.o ./system/src/cortexm/_reset_hardware.o ./system/src/cortexm/exception_handlers.o  ./system/src/cmsis/startup_stm32f103xb.o ./system/src/cmsis/system_stm32f1xx.o  ./src/_write.o ./src/main.o ./src/stm32f1xx_it.o ./src/stm32f1xx_nucleo.o   
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-writer.o): In function `_write_r':
+writer.c:(.text._write_r+0x10): undefined reference to `_write'
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-closer.o): In function `_close_r':
+closer.c:(.text._close_r+0xc): undefined reference to `_close'
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-lseekr.o): In function `_lseek_r':
+lseekr.c:(.text._lseek_r+0x10): undefined reference to `_lseek'
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-readr.o): In function `_read_r':
+readr.c:(.text._read_r+0x10): undefined reference to `_read'
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-fstatr.o): In function `_fstat_r':
+fstatr.c:(.text._fstat_r+0xe): undefined reference to `_fstat'
+c:/stm32toolchain/gnu-arm/4.8-2014q3/bin/../lib/gcc/arm-none-eabi/5.4.1/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-isattyr.o): In function `_isatty_r':
+isattyr.c:(.text._isatty_r+0xc): undefined reference to `_isatty'
+collect2.exe: error: ld returned 1 exit status
+make: *** [test1.elf] Error 1
+makefile:62: recipe for target 'test1.elf' failed
 
-16:45:40 Build Finished (took 1s.352ms)
+14:03:40 Build Finished (took 5s.667ms)
 
