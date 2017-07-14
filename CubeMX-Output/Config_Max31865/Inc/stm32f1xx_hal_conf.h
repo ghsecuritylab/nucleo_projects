@@ -114,6 +114,24 @@
 #endif /* HSI_VALUE */
 
 /**
+  * @brief In the following line adjust the Internal High Speed oscillator (HSI) Startup 
+  *        Timeout value 
+  */
+#if !defined  (HSI_STARTUP_TIMEOUT) 
+ #define HSI_STARTUP_TIMEOUT   ((uint32_t)5000) /*!< Time out for HSI start up */
+#endif /* HSI_STARTUP_TIMEOUT */  
+
+/**
+  * @brief Internal Low Speed oscillator (LSI) value.
+  */
+#if !defined  (LSI_VALUE) 
+ #define LSI_VALUE  ((uint32_t)40000)    
+#endif /* LSI_VALUE */                      /*!< Value of the Internal Low Speed oscillator in Hz
+                                             The real value may vary depending on the variations
+                                             in voltage and temperature.  */
+
+
+/**
   * @brief External Low Speed oscillator (LSE) value.
   *        This value is used by the UART, RTC HAL module to compute the system frequency
   */
@@ -136,6 +154,8 @@
 #define  TICK_INT_PRIORITY            ((uint32_t)0)    /*!< tick interrupt priority (lowest by default)  */            
 #define  USE_RTOS                     0
 #define  PREFETCH_ENABLE              1
+#define  INSTRUCTION_CACHE_ENABLE     0
+#define  DATA_CACHE_ENABLE            0
 
 /* ########################## Assert Selection ############################## */
 /**
