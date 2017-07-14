@@ -275,7 +275,7 @@ void BlinkTask(void const *argument)
 	if(osSemaphoreWait(semHandle, osWaitForever) == osOK) {
 		while(1) {
 			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-			osDelay(10000);
+			osDelay(500);
 		}
 	}
 }
