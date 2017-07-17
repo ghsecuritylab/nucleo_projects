@@ -1,0 +1,25 @@
+--cpu Cortex-M3
+"config_max31865_keil\stm32f1xx_hal_rcc.o"
+"config_max31865_keil\stm32f1xx_hal_uart.o"
+"config_max31865_keil\stm32f1xx_hal_dma.o"
+"config_max31865_keil\stm32f1xx_hal.o"
+"config_max31865_keil\stm32f1xx_hal_flash_ex.o"
+"config_max31865_keil\stm32f1xx_hal_rcc_ex.o"
+"config_max31865_keil\stm32f1xx_hal_pwr.o"
+"config_max31865_keil\stm32f1xx_hal_flash.o"
+"config_max31865_keil\stm32f1xx_hal_spi.o"
+"config_max31865_keil\stm32f1xx_hal_gpio_ex.o"
+"config_max31865_keil\stm32f1xx_hal_gpio.o"
+"config_max31865_keil\stm32f1xx_hal_tim_ex.o"
+"config_max31865_keil\stm32f1xx_hal_tim.o"
+"config_max31865_keil\stm32f1xx_hal_cortex.o"
+"config_max31865_keil\stm32f1xx_hal_spi_ex.o"
+"config_max31865_keil\startup_stm32f103xb.o"
+"config_max31865_keil\main.o"
+"config_max31865_keil\stm32f1xx_hal_msp.o"
+"config_max31865_keil\stm32f1xx_it.o"
+"config_max31865_keil\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "Config_Max31865_keil\Config_Max31865_keil.sct"
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Config_Max31865_keil.map" -o Config_Max31865_keil\Config_Max31865_keil.axf

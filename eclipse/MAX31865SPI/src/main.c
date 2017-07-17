@@ -115,6 +115,7 @@ void MAX31865_full_read(void)
 int main(void)
 {
 
+
   /* USER CODE BEGIN 1 */
 	uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
 	double tmp;
@@ -134,7 +135,6 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
- 
   /* USER CODE BEGIN 2 */
 
  /* (1) : SPI Transmit, write to config reg on address 0x80 */
