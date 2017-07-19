@@ -40,36 +40,99 @@
 #include "stm32f1xx_hal.h"
 
 /* USER CODE BEGIN Includes */
+/* Macros to enable & disable CS pin */
+#define CS_ENABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET); } while(0);
+#define CS_DISABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); } while(0);
 
+/* SPI TIMEOUT Value*/
+#define TIMEOUT_VAL 60
+
+// The value of the Rref resistor in Ohm
+#define RREF 430.0
+
+
+/* Read Register Address */
+#define REG_CONFIG                  0x00
+#define REG_RTD_MSB                 0x01
+#define REG_RTD_LSB                 0x02
+#define REG_HIGH_FAULT_THR_MSB      0x03
+#define REG_HIGH_FAULT_THR_LSB      0x04
+#define REG_LOW_FAULT_THR_MSB       0x05
+#define REG_LOW_FAULT_THR_LSB       0x06
+#define REG_FAULT_STATUS            0x07
+#define WR(reg)                     ( (reg) | 0x80 )
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi2;
+SPI_HandleTypeDef hspi1;
+
+UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+struct __attribute__((packed)) var_max31865
+{
+  uint16_t rtd_res_raw;			// RTD IC raw resistance register
+  uint8_t  status;					// RTD status - full status code
+  uint8_t  conf_reg;				// Configuration register readout
+  uint16_t  HFT_val;				// High fault threshold register readout
+  uint16_t  LFT_val;				// Low fault threshold register readout
+};
 
+struct var_max31865 rtd_data;
+uint8_t read_addr = 0x00; //Read address of Configuration register
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI2_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+void MAX31865_full_read(void);
+
 
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-
+/* Function to unpack and store MAX31865 data */
+void MAX31865_full_read(void)
+{
+	uint8_t read_data[8]; //variable to store the contents of the registers
+	//printf("read_data raw: %u", read_data);
+	uint8_t i = 0; //loop variable
+	
+	// Step(1): Bring the CS pin low to activate the slave device
+	CS_ENABLE
+	// Step(2): Transmit config reg address telling IC that we want to 'read' and start at register 0
+	HAL_SPI_Transmit(&hspi1, &read_addr, 1, TIMEOUT_VAL);
+	/* Step (3): Receive the first 8 bits (Config reg data) */
+	for(i = 0; i < 8; i++)
+	{
+		HAL_SPI_Receive(&hspi1, &read_data[i], 1, TIMEOUT_VAL);
+	}
+	// Step(4): Bring the CS pin high again
+	CS_DISABLE
+	/* Step (5): Store the data read from the sensor */
+	rtd_data.conf_reg = read_data[0]; //Store config reg data
+	rtd_data.rtd_res_raw = ((read_data[1] << 8) | read_data[2]) >> 1; // Store rtd_res_raw
+	rtd_data.HFT_val = ((read_data[3] << 8) | read_data[4]) >> 1; // Store HFT_val
+	rtd_data.LFT_val = (read_data[5] << 8) | read_data[6]; // Store LFT_val
+	rtd_data.status = read_data[7]; //Store fault status reg data	
+}
 /* USER CODE END 0 */
 
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+	uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
+	double resistanceRTD;
+	double tmp;
+	char Rrtd[30]; //array to print RTD resistance
+	char Trtd[30]; //array to print RTD temperature
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -90,10 +153,23 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI2_Init();
+  MX_SPI1_Init();
+  MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
 
+ /* (1) : SPI Transmit, write to config reg on address 0x80 */
+  // Step(1): Bring the CS pin low to activate the slave device
+  CS_ENABLE
+  HAL_Delay(10); //This delay is very important in the case of STM32F334 in order to work with MAX31865
+  // Step(2): Transmit config reg address  & data
+  HAL_SPI_Transmit(&hspi1, &config_reg_write[0], 1, TIMEOUT_VAL);
+  HAL_SPI_Transmit(&hspi1, &config_reg_write[1], 1, TIMEOUT_VAL);
+  // Step(3): Bring the CS pin high again
+  CS_DISABLE
+	
+	// give the sensor time to set up
+  HAL_Delay(100);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -103,7 +179,22 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
+    HAL_Delay(500);
+		
+    MAX31865_full_read();
+		
+    /* calculate RTD resistance */
+    resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
+    sprintf(Rrtd, "Rrtd = %lf\n", resistanceRTD);
+    HAL_UART_Transmit(&huart2, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
+    HAL_Delay(500);
+		
+    /* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
+    /* more accurate curve can be used outside that range */
+    tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
+    sprintf(Trtd, "Trtd = %lf deg C\n", tmp);
+    HAL_UART_Transmit(&huart2, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
+    HAL_Delay(500);
   }
   /* USER CODE END 3 */
 
@@ -156,23 +247,42 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* SPI2 init function */
-static void MX_SPI2_Init(void)
+/* SPI1 init function */
+static void MX_SPI1_Init(void)
 {
 
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_MASTER;
-  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* USART2 init function */
+static void MX_USART2_UART_Init(void)
+{
+
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -185,8 +295,6 @@ static void MX_SPI2_Init(void)
         * Output
         * EVENT_OUT
         * EXTI
-     PA2   ------> USART2_TX
-     PA3   ------> USART2_RX
 */
 static void MX_GPIO_Init(void)
 {
@@ -194,53 +302,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS8_GPIO_Port, CS8_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : USART_TX_Pin USART_RX_Pin */
-  GPIO_InitStruct.Pin = USART_TX_Pin|USART_RX_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : LD2_Pin CS6_Pin CS7_Pin CS1_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin;
+  /*Configure GPIO pin : CS_Pin */
+  GPIO_InitStruct.Pin = CS1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : CS5_Pin CS2_Pin CS4_Pin CS3_Pin */
-  GPIO_InitStruct.Pin = CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : CS8_Pin */
-  GPIO_InitStruct.Pin = CS8_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS8_GPIO_Port, &GPIO_InitStruct);
-
-  /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  HAL_GPIO_Init(CS1_GPIO_Port, &GPIO_InitStruct);
 
 }
 

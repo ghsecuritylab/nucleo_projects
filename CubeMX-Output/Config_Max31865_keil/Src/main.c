@@ -92,6 +92,8 @@ static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 void MAX31865_full_read(void);
+
+
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -99,6 +101,7 @@ void MAX31865_full_read(void);
 void MAX31865_full_read(void)
 {
 	uint8_t read_data[8]; //variable to store the contents of the registers
+	//printf("read_data raw: %u", read_data);
 	uint8_t i = 0; //loop variable
 	
 	// Step(1): Bring the CS pin low to activate the slave device
