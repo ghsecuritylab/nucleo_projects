@@ -41,8 +41,19 @@
 
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
-#define CS_ENABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET); } while(0);
-#define CS_DISABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); } while(0);
+#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); } while(0);
+#define CS_DISABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET); } while(0);
+
+void CS_ENABLE1(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
+}
+
+
+void CS_DISABLE1(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);  
+}
 
 /* SPI TIMEOUT Value*/
 #define TIMEOUT_VAL 60
@@ -64,7 +75,7 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi2;
 
 UART_HandleTypeDef huart2;
 
@@ -107,11 +118,11 @@ void MAX31865_full_read(void)
 	// Step(1): Bring the CS pin low to activate the slave device
 	CS_ENABLE
 	// Step(2): Transmit config reg address telling IC that we want to 'read' and start at register 0
-	HAL_SPI_Transmit(&hspi1, &read_addr, 1, TIMEOUT_VAL);
+	HAL_SPI_Transmit(&hspi2, &read_addr, 1, TIMEOUT_VAL);
 	/* Step (3): Receive the first 8 bits (Config reg data) */
 	for(i = 0; i < 8; i++)
 	{
-		HAL_SPI_Receive(&hspi1, &read_data[i], 1, TIMEOUT_VAL);
+		HAL_SPI_Receive(&hspi2, &read_data[i], 1, TIMEOUT_VAL);
 	}
 	// Step(4): Bring the CS pin high again
 	CS_DISABLE
@@ -163,8 +174,8 @@ int main(void)
   CS_ENABLE
   HAL_Delay(10); //This delay is very important in the case of STM32F334 in order to work with MAX31865
   // Step(2): Transmit config reg address  & data
-  HAL_SPI_Transmit(&hspi1, &config_reg_write[0], 1, TIMEOUT_VAL);
-  HAL_SPI_Transmit(&hspi1, &config_reg_write[1], 1, TIMEOUT_VAL);
+  HAL_SPI_Transmit(&hspi2, &config_reg_write[0], 1, TIMEOUT_VAL);
+  HAL_SPI_Transmit(&hspi2, &config_reg_write[1], 1, TIMEOUT_VAL);
   // Step(3): Bring the CS pin high again
   CS_DISABLE
 	
@@ -251,19 +262,19 @@ void SystemClock_Config(void)
 static void MX_SPI1_Init(void)
 {
 
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }

@@ -41,8 +41,20 @@
 
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
-#define CS_ENABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET); } while(0);
-#define CS_DISABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); } while(0);
+//#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); } while(0);
+//#define CS_DISABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET); } while(0);
+
+
+/* Functions to en- and disable the CS_Pin from Port and Pin */
+void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
+}
+
+void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);
+}
 
 /* SPI TIMEOUT Value*/
 #define TIMEOUT_VAL 60
@@ -64,7 +76,7 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi2;
 
 UART_HandleTypeDef huart2;
 
@@ -81,6 +93,22 @@ struct __attribute__((packed)) var_max31865
 
 struct var_max31865 rtd_data;
 uint8_t read_addr = 0x00; //Read address of Configuration register
+
+/*variables of resistance and temperature*/
+double resistanceRTD;
+double tmp;
+
+/*register to initiate SPI*/
+uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
+
+/*arrays to print values in for resistance and temperature*/
+char Rrtd[30]; //array to print RTD resistance
+char Trtd[30]; //array to print RTD temperature
+char Stop[30]; //indicates all is read
+/*ChipSelect pins and ports*/
+GPIO_TypeDef* CS_GPIO_Port[8]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port};
+uint16_t CS_Pin[8]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,36 +119,63 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void MAX31865_full_read(void);
-
-
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void CS_ENSABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
 /* Function to unpack and store MAX31865 data */
-void MAX31865_full_read(void)
+
+void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+ /* (1) : SPI Transmit, write to config reg on address 0x80 */
+  // Step(1): Bring the CS pin low to activate the slave device
+  CS_ENABLE(CS_GPIO_Port, CS_Pin);
+  HAL_Delay(10); //This delay is very important in the case of STM32F334 in order to work with MAX31865
+  // Step(2): Transmit config reg address  & data
+  HAL_SPI_Transmit(&hspi2, &config_reg_write[0], 1, TIMEOUT_VAL);
+  HAL_SPI_Transmit(&hspi2, &config_reg_write[1], 1, TIMEOUT_VAL);
+  // Step(3): Bring the CS pin high again
+  CS_DISABLE(CS_GPIO_Port, CS_Pin);
+}
+
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 {
 	uint8_t read_data[8]; //variable to store the contents of the registers
 	//printf("read_data raw: %u", read_data);
 	uint8_t i = 0; //loop variable
 	
 	// Step(1): Bring the CS pin low to activate the slave device
-	CS_ENABLE
+	CS_ENABLE(CS_GPIO_Port, CS_Pin);
 	// Step(2): Transmit config reg address telling IC that we want to 'read' and start at register 0
-	HAL_SPI_Transmit(&hspi1, &read_addr, 1, TIMEOUT_VAL);
+	HAL_SPI_Transmit(&hspi2, &read_addr, 1, TIMEOUT_VAL);
 	/* Step (3): Receive the first 8 bits (Config reg data) */
 	for(i = 0; i < 8; i++)
 	{
-		HAL_SPI_Receive(&hspi1, &read_data[i], 1, TIMEOUT_VAL);
+		HAL_SPI_Receive(&hspi2, &read_data[i], 1, TIMEOUT_VAL);
 	}
 	// Step(4): Bring the CS pin high again
-	CS_DISABLE
+	CS_DISABLE( CS_GPIO_Port, CS_Pin);
 	/* Step (5): Store the data read from the sensor */
 	rtd_data.conf_reg = read_data[0]; //Store config reg data
 	rtd_data.rtd_res_raw = ((read_data[1] << 8) | read_data[2]) >> 1; // Store rtd_res_raw
 	rtd_data.HFT_val = ((read_data[3] << 8) | read_data[4]) >> 1; // Store HFT_val
 	rtd_data.LFT_val = (read_data[5] << 8) | read_data[6]; // Store LFT_val
 	rtd_data.status = read_data[7]; //Store fault status reg data	
+
+  /* calculate RTD resistance */
+    resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
+	sprintf(Rrtd, "\n%u: \nRtd = %lf\n", CS_Pin, resistanceRTD);
+    HAL_UART_Transmit(&huart2, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
+	
+	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
+    /* more accurate curve can be used outside that range */
+    tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
+	sprintf(Trtd, "Trtd = %lf\n", tmp);
+    HAL_UART_Transmit(&huart2, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
+	
+	HAL_Delay(500);
 }
 /* USER CODE END 0 */
 
@@ -128,11 +183,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
-	double resistanceRTD;
-	double tmp;
-	char Rrtd[30]; //array to print RTD resistance
-	char Trtd[30]; //array to print RTD temperature
+	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -158,18 +209,14 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
- /* (1) : SPI Transmit, write to config reg on address 0x80 */
-  // Step(1): Bring the CS pin low to activate the slave device
-  CS_ENABLE
-  HAL_Delay(10); //This delay is very important in the case of STM32F334 in order to work with MAX31865
-  // Step(2): Transmit config reg address  & data
-  HAL_SPI_Transmit(&hspi1, &config_reg_write[0], 1, TIMEOUT_VAL);
-  HAL_SPI_Transmit(&hspi1, &config_reg_write[1], 1, TIMEOUT_VAL);
-  // Step(3): Bring the CS pin high again
-  CS_DISABLE
-	
+for(int conf=0;conf< 8;conf++)
+	{
+	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
+	HAL_Delay(500);
+
+}	
 	// give the sensor time to set up
-  HAL_Delay(100);
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,23 +226,14 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-    HAL_Delay(500);
-		
-    MAX31865_full_read();
-		
-    /* calculate RTD resistance */
-    resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
-    sprintf(Rrtd, "Rrtd = %lf\n", resistanceRTD);
-    HAL_UART_Transmit(&huart2, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
-    HAL_Delay(500);
-		
-    /* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
-    /* more accurate curve can be used outside that range */
-    tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
-    sprintf(Trtd, "Trtd = %lf deg C\n", tmp);
-    HAL_UART_Transmit(&huart2, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
-    HAL_Delay(500);
-  }
+for(int i=0;i< 8;i++)
+	{
+    MAX31865_full_read(CS_GPIO_Port[i],CS_Pin[i]);
+  
+	}
+		sprintf(Stop, " Runs is over");
+
+	}
   /* USER CODE END 3 */
 
 }
@@ -251,19 +289,19 @@ void SystemClock_Config(void)
 static void MX_SPI1_Init(void)
 {
 
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }

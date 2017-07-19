@@ -10,6 +10,7 @@
       <TargetName>SPI_selfmade</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -335,7 +336,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc; ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32F1xx/Include; ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -488,6 +489,11 @@
               <FileName>stm32f1xx_hal_tim_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f1xx_hal_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c</FilePath>
             </File>
           </Files>
         </Group>

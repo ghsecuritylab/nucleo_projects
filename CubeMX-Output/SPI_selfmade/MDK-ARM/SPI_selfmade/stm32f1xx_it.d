@@ -25,4 +25,5 @@ spi_selfmade\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_f
 spi_selfmade\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 spi_selfmade\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 spi_selfmade\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+spi_selfmade\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 spi_selfmade\stm32f1xx_it.o: ../Inc/stm32f1xx_it.h

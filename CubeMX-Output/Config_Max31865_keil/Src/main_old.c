@@ -41,8 +41,8 @@
 
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
-#define CS_ENABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET); } while(0);
-#define CS_DISABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); } while(0);
+#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); } while(0);
+#define CS_DISABLE		do { HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET); } while(0);
 
 /* SPI TIMEOUT Value*/
 #define TIMEOUT_VAL 60
@@ -307,13 +307,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : CS_Pin */
-  GPIO_InitStruct.Pin = CS1_Pin;
+  GPIO_InitStruct.Pin = CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(CS_GPIO_Port, &GPIO_InitStruct);
 
 }
 

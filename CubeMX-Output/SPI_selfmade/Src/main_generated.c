@@ -41,8 +41,8 @@
 
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
-#define CS_ENABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET); } while(0);
-#define CS_DISABLE		do { HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET); } while(0);
+#define CS_ENABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET); } while(0);
+#define CS_DISABLE		do { HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_SET); } while(0);
 
 /* SPI TIMEOUT Value*/
 #define TIMEOUT_VAL 60
@@ -64,7 +64,7 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi2;
 
 UART_HandleTypeDef huart2;
 
@@ -86,7 +86,7 @@ uint8_t read_addr = 0x00; //Read address of Configuration register
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
+static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
@@ -153,7 +153,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
+  MX_SPI2_Init();
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
@@ -247,23 +247,23 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* SPI1 init function */
-static void MX_SPI1_Init(void)
+/* SPI2 init function */
+static void MX_SPI2_Init(void)
 {
 
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  hspi2.Instance = SPI2;
+  hspi2.Init.Mode = SPI_MODE_MASTER;
+  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi2.Init.NSS = SPI_NSS_SOFT;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi2.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi2) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -302,18 +302,47 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : CS_Pin */
-  GPIO_InitStruct.Pin = CS1_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(CS8_GPIO_Port, CS8_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LD2_Pin CS6_Pin CS7_Pin CS1_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : CS5_Pin CS2_Pin CS4_Pin CS3_Pin */
+  GPIO_InitStruct.Pin = CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : CS8_Pin */
+  GPIO_InitStruct.Pin = CS8_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(CS8_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
