@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    system_stm32f1xx.c
   * @author  MCD Application Team
-  * @version V1.4.0
+  * @version V4.1.0
   * @date    29-April-2016
   * @brief   CMSIS Cortex-M3 Device Peripheral Access Layer System Source File.
   * 
@@ -141,6 +141,7 @@
 
 const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 const uint8_t APBPrescTable[8] =  {0, 0, 0, 0, 1, 2, 3, 4};
+
 /**
   * @}
   */
@@ -422,7 +423,7 @@ void SystemInit_ExtMemCtl(void)
   GPIOF->CRH = 0xBBBB4444;
 
   GPIOG->CRL = 0x44BBBBBB;  
-  GPIOG->CRH = 0x44444B44;
+  GPIOG->CRH = 0x444B4B44;
    
 /*----------------  FSMC Configuration ---------------------------------------*/  
 /*----------------  Enable FSMC Bank1_SRAM Bank ------------------------------*/

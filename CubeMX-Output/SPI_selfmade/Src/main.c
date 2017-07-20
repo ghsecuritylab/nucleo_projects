@@ -107,7 +107,7 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void CS_ENSABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
