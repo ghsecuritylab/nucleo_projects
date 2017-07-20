@@ -44,24 +44,11 @@
 //#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); } while(0);
 //#define CS_DISABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET); } while(0);
 
-
-/* Functions to en- and disable the CS_Pin from Port and Pin */
-void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
-{
-  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
-}
-
-void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
-{
-  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);
-}
-
 /* SPI TIMEOUT Value*/
 #define TIMEOUT_VAL 60
 
 // The value of the Rref resistor in Ohm
 #define RREF 430.0
-
 
 /* Read Register Address */
 #define REG_CONFIG                  0x00
@@ -105,6 +92,7 @@ uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
 char Rrtd[30]; //array to print RTD resistance
 char Trtd[30]; //array to print RTD temperature
 char Stop[30]; //indicates all is read
+
 /*ChipSelect pins and ports*/
 GPIO_TypeDef* CS_GPIO_Port[8]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port};
 uint16_t CS_Pin[8]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin};
@@ -119,13 +107,27 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_ENSABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-/* Function to unpack and store MAX31865 data */
+
+/* Functions to en- and disable the CS_Pin from Port and Pin */
+void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
+}
+
+void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+{
+  HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);
+}
+
+/* Function to configure and initiate SPI */
 
 void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 {
@@ -139,6 +141,8 @@ void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
   // Step(3): Bring the CS pin high again
   CS_DISABLE(CS_GPIO_Port, CS_Pin);
 }
+
+/* Function to unpack and store MAX31865 data */
 
 void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 {
@@ -166,17 +170,18 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 
   /* calculate RTD resistance */
     resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
-	sprintf(Rrtd, "\n%u: \nRtd = %lf\n", CS_Pin, resistanceRTD);
+		sprintf(Rrtd, "\n%u: \nRrtd = %lf\n", CS_Pin, resistanceRTD);
     HAL_UART_Transmit(&huart2, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
-    /* more accurate curve can be used outside that range */
+    /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
     tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
-	sprintf(Trtd, "Trtd = %lf\n", tmp);
+		sprintf(Trtd, "Trtd = %lf\n", tmp);
     HAL_UART_Transmit(&huart2, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
-	HAL_Delay(500);
+	HAL_Delay(1000);
 }
+
 /* USER CODE END 0 */
 
 int main(void)
@@ -214,24 +219,25 @@ for(int conf=0;conf< 8;conf++)
 	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
 	HAL_Delay(500);
 
-}	
+	}	
 	// give the sensor time to set up
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+while (1)
   {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-for(int i=0;i< 8;i++)
-	{
-    MAX31865_full_read(CS_GPIO_Port[i],CS_Pin[i]);
-  
-	}
-		sprintf(Stop, " Runs is over");
+	for(int i=0;i< 8;i++)
+		{
+		MAX31865_full_read(CS_GPIO_Port[i],CS_Pin[i]);
+		
+		}
+	HAL_Delay(2000);
+	sprintf(Stop, "%i sensors read\n", 8);
 
 	}
   /* USER CODE END 3 */
@@ -340,18 +346,47 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(CS1_GPIO_Port, CS1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : CS_Pin */
-  GPIO_InitStruct.Pin = CS1_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(CS8_GPIO_Port, CS8_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LD2_Pin CS6_Pin CS7_Pin CS1_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(CS1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : CS5_Pin CS2_Pin CS4_Pin CS3_Pin */
+  GPIO_InitStruct.Pin = CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : CS8_Pin */
+  GPIO_InitStruct.Pin = CS8_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(CS8_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
