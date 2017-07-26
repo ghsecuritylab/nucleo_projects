@@ -102,7 +102,7 @@ uint16_t CS_Pin[8]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
+static void MX_SPI2_Init(void); //used to be SPI1
 static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
@@ -188,7 +188,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	
+
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -209,7 +209,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_SPI1_Init();
+  MX_SPI2_Init();//used to be SPI1
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
@@ -239,7 +239,7 @@ while (1)
 	HAL_Delay(2000);
 	sprintf(Stop, "%i sensors read\n", 8);
 
-	}
+  }
   /* USER CODE END 3 */
 
 }
@@ -291,8 +291,8 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* SPI1 init function */
-static void MX_SPI1_Init(void)
+/* SPI2 init function */
+static void MX_SPI2_Init(void)
 {
 
   hspi2.Instance = SPI2;

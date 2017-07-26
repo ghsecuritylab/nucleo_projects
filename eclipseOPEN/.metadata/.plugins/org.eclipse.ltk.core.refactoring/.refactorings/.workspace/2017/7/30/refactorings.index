@@ -1,2 +1,4 @@
 1500987067602	Delete resource 'PrintBlink'
 1500990615001	Delete resource 'Tetst2'
+1501079382617	Delete resource 'FreeRTOS/src/_write.c'
+1501079464958	Delete resource 'FreeRTOS/HAL_Driver/Src/stm32f1xx_hal_msp_template.c'
