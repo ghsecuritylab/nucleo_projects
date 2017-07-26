@@ -1,0 +1,34 @@
+14:44:25 **** Incremental Build of configuration Debug for project PrintBlink ****
+make all 
+Building file: ../src/main.c
+Invoking: MCU GCC Compiler
+C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -DSTM32F1 -DNUCLEO_F103RB -DSTM32F103RBTx -DSTM32 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -DUSE_RTOS_SYSTICK -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/core" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/device" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc/Legacy" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/include" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Utilities/STM32F1xx_Nucleo" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/main.d" -MT"src/main.o" -o "src/main.o" "../src/main.c"
+Finished building: ../src/main.c
+ 
+Building file: ../src/stm32f1xx_it.c
+Invoking: MCU GCC Compiler
+C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -DSTM32F1 -DNUCLEO_F103RB -DSTM32F103RBTx -DSTM32 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -DUSE_RTOS_SYSTICK -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/core" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/device" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc/Legacy" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/include" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Utilities/STM32F1xx_Nucleo" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/stm32f1xx_it.d" -MT"src/stm32f1xx_it.o" -o "src/stm32f1xx_it.o" "../src/stm32f1xx_it.c"
+Finished building: ../src/stm32f1xx_it.c
+ 
+Building file: ../src/system_stm32f1xx.c
+Invoking: MCU GCC Compiler
+C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -DSTM32F1 -DNUCLEO_F103RB -DSTM32F103RBTx -DSTM32 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -DUSE_RTOS_SYSTICK -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/core" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/CMSIS/device" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc/Legacy" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/HAL_Driver/Inc" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/include" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" -I"C:/STM32Toolchain/projects/eclipseOPEN/PrintBlink/Utilities/STM32F1xx_Nucleo" -O0 -g3 -Wall -fmessage-length=0 -ffunction-sections -c -MMD -MP -MF"src/system_stm32f1xx.d" -MT"src/system_stm32f1xx.o" -o "src/system_stm32f1xx.o" "../src/system_stm32f1xx.c"
+Finished building: ../src/system_stm32f1xx.c
+ 
+Building target: PrintBlink.elf
+Invoking: MCU GCC Linker
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -mfloat-abi=soft -T"C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "PrintBlink.elf" @"objects.list"   -lm
+src/stm32f1xx_it.o: In function `SVC_Handler':
+C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug/../src/stm32f1xx_it.c:131: multiple definition of `SVC_Handler'
+Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.o:C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug/../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.c:246: first defined here
+src/stm32f1xx_it.o: In function `NMI_Handler':
+C:\STM32Toolchain\projects\eclipseOPEN\PrintBlink\Debug/../src/stm32f1xx_it.c:70: multiple definition of `PendSV_Handler'
+Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.o:port.c:(.text.PendSV_Handler+0x0): first defined here
+collect2.exe: error: ld returned 1 exit status
+make: *** [PrintBlink.elf] Error 1
+
+14:44:42 Build Finished (took 16s.997ms)
+
