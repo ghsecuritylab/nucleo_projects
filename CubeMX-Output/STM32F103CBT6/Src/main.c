@@ -237,7 +237,7 @@ while (1)
 		
 		}
 	HAL_Delay(2000);
-	sprintf(Stop, "%i sensors read\n", 8);
+	sprintf(Stop, "Rounds done = %i \n", 8);
 
   }
   /* USER CODE END 3 */
