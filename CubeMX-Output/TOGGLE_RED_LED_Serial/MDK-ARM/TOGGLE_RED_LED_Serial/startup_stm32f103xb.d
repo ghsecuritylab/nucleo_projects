@@ -1,0 +1,1 @@
+toggle_red_led_serial\startup_stm32f103xb.o: startup_stm32f103xb.s

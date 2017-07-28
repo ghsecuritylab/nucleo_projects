@@ -46,36 +46,47 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define CS4_Pin GPIO_PIN_13
-#define CS4_GPIO_Port GPIOC
-#define CS3_Pin GPIO_PIN_14
-#define CS3_GPIO_Port GPIOC
-#define CS9_Pin GPIO_PIN_15
-#define CS9_GPIO_Port GPIOC
-#define CS8_Pin GPIO_PIN_1
-#define CS8_GPIO_Port GPIOA
-#define USART_RX_Pin GPIO_PIN_2
+#define LEDred_Pin GPIO_PIN_0
+#define LEDred_GPIO_Port GPIOA
+
+#define USART_TX_Pin GPIO_PIN_9
+#define USART_TX_GPIO_Port GPIOA
+#define USART_RX_Pin GPIO_PIN_10
 #define USART_RX_GPIO_Port GPIOA
-#define USART_RXA3_Pin GPIO_PIN_3
-#define USART_RXA3_GPIO_Port GPIOA
-#define CS7_Pin GPIO_PIN_4
-#define CS7_GPIO_Port GPIOA
-#define CS2_Pin GPIO_PIN_6
-#define CS2_GPIO_Port GPIOA
+
+#define USART2_TX_Pin GPIO_PIN_2
+#define USART2_TX_GPIO_Port GPIOA
+#define USART2_RX_Pin GPIO_PIN_3
+#define USART2_RX_GPIO_Port GPIOA
+
 #define CS1_Pin GPIO_PIN_0
 #define CS1_GPIO_Port GPIOB
+#define CS2_Pin GPIO_PIN_6
+#define CS2_GPIO_Port GPIOA
+#define CS3_Pin GPIO_PIN_14
+#define CS3_GPIO_Port GPIOC
+#define CS4_Pin GPIO_PIN_13
+#define CS4_GPIO_Port GPIOC
 #define CS5_Pin GPIO_PIN_1
 #define CS5_GPIO_Port GPIOB
 #define CS6_Pin GPIO_PIN_12
 #define CS6_GPIO_Port GPIOB
+#define CS7_Pin GPIO_PIN_4
+#define CS7_GPIO_Port GPIOA
+#define CS8_Pin GPIO_PIN_1
+#define CS8_GPIO_Port GPIOA
+#define CS9_Pin GPIO_PIN_15
+#define CS9_GPIO_Port GPIOC
+#define CS10_Pin GPIO_PIN_5
+#define CS10_GPIO_Port GPIOB
+
 #define SCK_Pin GPIO_PIN_13
 #define SCK_GPIO_Port GPIOB
 #define SDO_Pin GPIO_PIN_14
 #define SDO_GPIO_Port GPIOB
 #define SDI_Pin GPIO_PIN_15
 #define SDI_GPIO_Port GPIOB
-#define CS10_Pin GPIO_PIN_5
-#define CS10_GPIO_Port GPIOB
+
 
 /* USER CODE BEGIN Private defines */
 

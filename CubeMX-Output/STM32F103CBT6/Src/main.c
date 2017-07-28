@@ -39,6 +39,9 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
+
+#define LEDred_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
+
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
 //#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); } while(0);
@@ -48,7 +51,7 @@
 #define TIMEOUT_VAL 60
 
 // The value of the Rref resistor in Ohm
-#define RREF 430.0
+#define RREF 470000
 
 /* Read Register Address */
 #define REG_CONFIG                  0x00
@@ -65,6 +68,7 @@
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi2;
 
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -104,10 +108,12 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART1_UART_Init(void);
+static GPIO_InitTypeDef  GPIO_InitStruct;
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void CS_ENSABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
@@ -171,13 +177,13 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
   /* calculate RTD resistance */
     resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
 		sprintf(Rrtd, "\n%u: \nRrtd = %lf\n", CS_Pin, resistanceRTD);
-    HAL_UART_Transmit(&huart2, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
+    HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
     /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
     tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
 		sprintf(Trtd, "Trtd = %lf\n", tmp);
-    HAL_UART_Transmit(&huart2, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
+    HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
 	HAL_Delay(1000);
 }
@@ -202,6 +208,9 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+	
+  /* -1- Enable GPIO Clock (to be able to program the configuration registers) */
+  LEDred_GPIO_CLK_ENABLE();
 
   /* USER CODE BEGIN SysInit */
 
@@ -211,7 +220,15 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI2_Init();
   MX_USART2_UART_Init();
+  MX_USART1_UART_Init();
 
+  /* -2- Configure IO in output push-pull mode to drive external LEDs */
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   /* USER CODE BEGIN 2 */
 
 for(int conf=0;conf< 10;conf++)
@@ -226,11 +243,22 @@ for(int conf=0;conf< 10;conf++)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-while (1)
+	char *msg = "Initiating Temperature measurement\n\r";
+ 
+  
+  while (1)
   {
   /* USER CODE END WHILE */
+		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
-  /* USER CODE BEGIN 3 */
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    HAL_Delay(500);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		HAL_Delay(500);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		HAL_Delay(500);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+/* USER CODE BEGIN 3 */
 	for(int i=0;i< 10;i++)
 		{
 		MAX31865_full_read(CS_GPIO_Port[i],CS_Pin[i]);
@@ -238,7 +266,7 @@ while (1)
 		}
 	HAL_Delay(2000);
 	sprintf(Stop, "Rounds done = %i \n", 8);
-
+	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
   }
   /* USER CODE END 3 */
 
@@ -312,6 +340,25 @@ static void MX_SPI2_Init(void)
 
 }
 
+/* USART1 init function */
+static void MX_USART1_UART_Init(void)
+{
+
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /* USART2 init function */
 static void MX_USART2_UART_Init(void)
 {
@@ -353,6 +400,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, CS8_Pin|CS7_Pin|CS2_Pin, GPIO_PIN_RESET);
+  
+/*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, LEDred_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LEDred_Pin */
+  GPIO_InitStruct.Pin = LEDred_Pin;
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, CS1_Pin|CS5_Pin|CS6_Pin|CS10_Pin, GPIO_PIN_RESET);

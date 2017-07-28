@@ -1,0 +1,16 @@
+.\init_config.o: source\init_config.c
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\core_cm3.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_compiler.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h
+.\init_config.o: .\RTE\Device\STM32F103CB\stm32f10x_conf.h
+.\init_config.o: .\RTE\_MAXREFDES64\RTE_Components.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_rcc.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_spi.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_usart.h
+.\init_config.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\misc.h
+.\init_config.o: source\init_config.h

@@ -1,0 +1,23 @@
+--cpu Cortex-M3
+"toggle_red_led_serial_usart1\startup_stm32f103xb.o"
+"toggle_red_led_serial_usart1\stm32f1xx_it.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_msp.o"
+"toggle_red_led_serial_usart1\main.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_pwr.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_gpio.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_rcc.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_rcc_ex.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_flash_ex.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_tim.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_dma.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_flash.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_gpio_ex.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_uart.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_cortex.o"
+"toggle_red_led_serial_usart1\stm32f1xx_hal_tim_ex.o"
+"toggle_red_led_serial_usart1\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "TOGGLE_RED_LED_Serial_USART1\TOGGLE_RED_LED_Serial_USART1.sct"
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "TOGGLE_RED_LED_Serial_USART1.map" -o TOGGLE_RED_LED_Serial_USART1\TOGGLE_RED_LED_Serial_USART1.axf

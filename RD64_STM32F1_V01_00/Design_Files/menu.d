@@ -1,0 +1,17 @@
+.\menu.o: source\menu.c
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\menu.o: source\menu.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\core_cm3.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_compiler.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\system_stm32f10x.h
+.\menu.o: .\RTE\Device\STM32F103CB\stm32f10x_conf.h
+.\menu.o: .\RTE\_MAXREFDES64\RTE_Components.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_gpio.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include\stm32f10x.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_rcc.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_spi.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\stm32f10x_usart.h
+.\menu.o: C:\STM32Toolchain\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\StdPeriph_Driver\inc\misc.h

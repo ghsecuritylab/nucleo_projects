@@ -1,0 +1,18 @@
+--cpu Cortex-M3
+".\menu.o"
+".\init_config.o"
+".\utilities.o"
+".\retarget.o"
+".\max31913.o"
+".\maxrefdes64.o"
+".\startup_stm32f10x_md.o"
+".\system_stm32f10x.o"
+".\misc.o"
+".\stm32f10x_gpio.o"
+".\stm32f10x_rcc.o"
+".\stm32f10x_spi.o"
+".\stm32f10x_usart.o"
+--library_type=microlib --strict --scatter ".\MAXREFDES64.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\MAXREFDES64.map" -o .\MAXREFDES64.axf

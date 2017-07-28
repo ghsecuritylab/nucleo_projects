@@ -39,6 +39,9 @@
 #include "main.h"
 #include "stm32f1xx_hal.h"
 
+
+#define LEDred_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
+
 /* USER CODE BEGIN Includes */
 /* Macros to enable & disable CS pin */
 //#define CS_ENABLE		do { HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); } while(0);
@@ -65,6 +68,7 @@
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi2;
 
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -104,6 +108,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART1_UART_Init(void);
+static GPIO_InitTypeDef  GPIO_InitStruct;
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -202,6 +208,9 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
+	
+  /* -1- Enable GPIO Clock (to be able to program the configuration registers) */
+  LEDred_GPIO_CLK_ENABLE();
 
   /* USER CODE BEGIN SysInit */
 
@@ -211,7 +220,15 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
+  MX_USART1_UART_Init();
 
+  /* -2- Configure IO in output push-pull mode to drive external LEDs */
+  GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull  = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   /* USER CODE BEGIN 2 */
 
 for(int conf=0;conf< 8;conf++)
@@ -226,20 +243,28 @@ for(int conf=0;conf< 8;conf++)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-while (1)
+	char *msg = "Hello Nucleo Fun!\n\r";
+ 
+  
+  while (1)
   {
   /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    /* Insert delay 100 ms */
+    HAL_Delay(500);
+		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
+  
+/* USER CODE BEGIN 3 */
 	for(int i=0;i< 8;i++)
 		{
 		MAX31865_full_read(CS_GPIO_Port[i],CS_Pin[i]);
 		
 		}
 	HAL_Delay(2000);
-	sprintf(Stop, "%i sensors read\n", 8);
-
-	}
+	sprintf(Stop, "Rounds done = %i \n", 8);
+	HAL_UART_Transmit(&huart2, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+  }
   /* USER CODE END 3 */
 
 }
@@ -257,6 +282,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
+	
+	//COULD BE RCC_PLL_NONE and delete next 2 lines after
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
@@ -291,8 +318,8 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* SPI1 init function */
-static void MX_SPI1_Init(void)
+/* SPI2 init function */
+static void MX_SPI2_Init(void)
 {
 
   hspi2.Instance = SPI2;
@@ -308,6 +335,25 @@ static void MX_SPI1_Init(void)
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   hspi2.Init.CRCPolynomial = 10;
   if (HAL_SPI_Init(&hspi2) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
+/* USART1 init function */
+static void MX_USART1_UART_Init(void)
+{
+
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -355,6 +401,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LD2_Pin|CS6_Pin|CS7_Pin|CS1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(_GPIO_Port, LEDred_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : LEDred_Pin */
+  GPIO_InitStruct.Pin = LEDred_Pin;
+
   HAL_GPIO_WritePin(GPIOB, CS5_Pin|CS2_Pin|CS4_Pin|CS3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
