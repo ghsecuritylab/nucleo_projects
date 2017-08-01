@@ -107,8 +107,8 @@ char ReadReg7[30]; //display value getting transferred to resistance
 char ReadReg8[30]; //display value getting transferred to resistance
 
 /*ChipSelect pins and ports*/
-GPIO_TypeDef* CS_GPIO_Ports[10]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port,CS9_GPIO_Port,CS10_GPIO_Port};
-uint16_t CS_Pins[10]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin,CS9_Pin,CS10_Pin};
+GPIO_TypeDef* CS_GPIO_Port[10]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port,CS9_GPIO_Port,CS10_GPIO_Port};
+uint16_t CS_Pin[10]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin,CS9_Pin,CS10_Pin};
 
 /* USER CODE END PV */
 
@@ -262,7 +262,7 @@ int main(void)
 
 for(int conf=0;conf< 10;conf++)
 	{
-	configureSPI(CS_GPIO_Ports[conf],CS_Pins[conf]);
+	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
 	HAL_Delay(500);
 
 	}
@@ -297,7 +297,7 @@ for(int conf=0;conf< 10;conf++)
 		HAL_Delay(1000);
 		for(int i=3;i< 4;i++)
 		{
-		MAX31865_full_read(CS_GPIO_Ports[i],CS_Pins[i]);
+		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read]);
 		
 		}
 	
@@ -305,8 +305,7 @@ for(int conf=0;conf< 10;conf++)
 //				MAX31865_full_read(CS1_GPIO_Port,CS1_Pin);
 
 		
-	HAL_Delay(200);
-	sprintf(Stop, "Reading done\n\r");
+	
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 	HAL_Delay(1000);
   }
