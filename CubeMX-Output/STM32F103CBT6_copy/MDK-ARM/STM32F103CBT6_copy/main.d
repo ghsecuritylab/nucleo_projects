@@ -26,3 +26,4 @@ stm32f103cbt6_copy\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_fla
 stm32f103cbt6_copy\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 stm32f103cbt6_copy\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 stm32f103cbt6_copy\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+stm32f103cbt6_copy\main.o: C:\STM32Toolchain\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

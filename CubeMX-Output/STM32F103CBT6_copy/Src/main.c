@@ -38,6 +38,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "string.h"
 
 
 #define LEDred_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOA_CLK_ENABLE()
@@ -268,7 +269,7 @@ for(int conf=0;conf< 10;conf++)
 	HAL_Delay(200);
 	sprintf(Stop, "Reading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-	HAL_Delay(5000);
+	HAL_Delay(200);
   }
   /* USER CODE END 3 */
 
