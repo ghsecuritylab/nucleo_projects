@@ -1,0 +1,28 @@
+Initiating Temperature measurement
+
+1: 
+Rrtd = 4606.475830
+Trtd = 58.468750
+
+64: 
+Rrtd = 0.000000
+Trtd = -256.000000
+
+16384: 
+Rrtd = 4713.592529
+Trtd = 65.781250
+
+8192: 
+Rrtd = 4669.647217
+Trtd = 62.781250
+
+2: 
+Rrtd = 4641.723633
+Trtd = 60.875000
+
+4096: 
+Rrtd = 7499.542236
+Trtd = 255.968750
+
+Reading done
+
