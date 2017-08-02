@@ -195,7 +195,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 		sprintf(Trtd, "Trtd = %lf\n\r", tmp);
     HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
-	HAL_Delay(2000);
+	//HAL_Delay(2000);
 }
 
 /* USER CODE END 0 */
@@ -244,11 +244,11 @@ int main(void)
 for(int conf=0;conf< 10;conf++)
 	{
 	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
-	HAL_Delay(500);
+	//HAL_Delay(500);
 
 	}	
 	// give the sensor time to set up
-  HAL_Delay(1000);
+  //HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -261,13 +261,13 @@ for(int conf=0;conf< 10;conf++)
   /* USER CODE END WHILE */
 		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-    HAL_Delay(200);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(200);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(200);
-		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+//    HAL_Delay(200);
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+//		HAL_Delay(200);
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+//		HAL_Delay(200);
+//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		
 /* USER CODE BEGIN 3 */
 	for(int read= 0;read< 2;read++)
@@ -275,10 +275,10 @@ for(int conf=0;conf< 10;conf++)
 		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read]);
 		
 		}
-	HAL_Delay(200);
-	sprintf(Stop, "Reading done\n\r");
-	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-	HAL_Delay(2000);
+	//HAL_Delay(200);
+//	sprintf(Stop, "Reading done\n\r");
+//	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+//	HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 
