@@ -143,7 +143,7 @@ void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
  /* (1) : SPI Transmit, write to config reg on address 0x80 */
   // Step(1): Bring the CS pin low to activate the slave device
   CS_ENABLE(CS_GPIO_Port, CS_Pin);
-  //HAL_Delay(100); //This delay is very important in the case of STM32F334 in order to work with MAX31865
+  HAL_Delay(10); //This delay is very important in the case of STM32F334 in order to work with MAX31865
   // Step(2): Transmit config reg address  & data
   HAL_SPI_Transmit(&hspi2, &config_reg_write[0], 1, TIMEOUT_VAL);
   HAL_SPI_Transmit(&hspi2, &config_reg_write[1], 1, TIMEOUT_VAL);
@@ -177,7 +177,8 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	rtd_data.status = read_data[7]; //Store fault status reg data	
 
   /* calculate RTD resistance */
-	    resistanceRTD = ((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
+	//5143.92 as offset for 470k resistor
+	    resistanceRTD = 5143.92+((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
 		sprintf(Rrtd, "\n\r%u: \n\rRrtd = %lf\n\r", CS_Pin, resistanceRTD);
     HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
@@ -187,7 +188,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
     /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
   //  tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
-	tmp=1/(((log((double)rtd_data.rtd_res_raw / 10000))/3435)+(1/298.15));
+	tmp=1/(((log((double)rtd_data.rtd_res_raw /*resistanceRTD*/ / 10000))/3435)+(1/298.15));
 	tmp=tmp-273.15;
 	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
 	//http://www.carelparts.com/manuals/ntc-specs.pdf page 8
@@ -269,7 +270,7 @@ for(int conf=0;conf< 10;conf++)
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		
 /* USER CODE BEGIN 3 */
-	for(int read= 0;read< 10;read++)
+	for(int read= 0;read< 2;read++)
 		{
 		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read]);
 		
@@ -277,7 +278,7 @@ for(int conf=0;conf< 10;conf++)
 	HAL_Delay(200);
 	sprintf(Stop, "Reading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-	HAL_Delay(200);
+	HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 
