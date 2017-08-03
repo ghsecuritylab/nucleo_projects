@@ -53,8 +53,8 @@
 #define TIMEOUT_VAL 60
 
 // The value of the Rref resistor in Ohm
-//#define RREF 470000
-#define RREF 15000
+#define RREF 470000
+//#define RREF 15000
 
 /* Read Register Address */
 #define REG_CONFIG                  0x00
@@ -178,7 +178,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 
   /* calculate RTD resistance */
 	//5143.92 as offset for 470k resistor
-	    resistanceRTD = 5143.92+((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
+	    resistanceRTD = /*5143.92+*/((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
 		sprintf(Rrtd, "\n\r%u: \n\rRrtd = %lf\n\r", CS_Pin, resistanceRTD);
     HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
@@ -188,14 +188,14 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
     /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
   //  tmp = ((double)rtd_data.rtd_res_raw / 32) - 256;
-	tmp=1/(((log((double)rtd_data.rtd_res_raw /*resistanceRTD*/ / 10000))/3435)+(1/298.15));
+	tmp=1/(((log(/*(double)rtd_data.rtd_res_raw*/ resistanceRTD / 10000))/3435)+(1/298.15));
 	tmp=tmp-273.15;
 	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
 	//http://www.carelparts.com/manuals/ntc-specs.pdf page 8
 		sprintf(Trtd, "Trtd = %lf\n\r", tmp);
     HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
-	//HAL_Delay(2000);
+	HAL_Delay(2000);
 }
 
 /* USER CODE END 0 */
@@ -244,11 +244,11 @@ int main(void)
 for(int conf=0;conf< 10;conf++)
 	{
 	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
-	//HAL_Delay(500);
+	HAL_Delay(500);
 
 	}	
 	// give the sensor time to set up
-  //HAL_Delay(1000);
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -261,24 +261,24 @@ for(int conf=0;conf< 10;conf++)
   /* USER CODE END WHILE */
 		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-//    HAL_Delay(200);
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-//		HAL_Delay(200);
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-//		HAL_Delay(200);
-//		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    HAL_Delay(200);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		HAL_Delay(200);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+		HAL_Delay(200);
+		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		
 /* USER CODE BEGIN 3 */
-	for(int read= 0;read< 2;read++)
+	for(int read= 0;read< 10;read++)
 		{
 		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read]);
 		
 		}
-	//HAL_Delay(200);
-//	sprintf(Stop, "Reading done\n\r");
-//	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-//	HAL_Delay(2000);
+	HAL_Delay(200);
+	sprintf(Stop, "Reading done\n\r");
+	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+	HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 
@@ -297,7 +297,11 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  //RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -307,9 +311,11 @@ void SystemClock_Config(void)
     */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  //RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  //RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
@@ -338,9 +344,9 @@ static void MX_SPI2_Init(void)
   hspi2.Init.Direction = SPI_DIRECTION_2LINES;
   hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
