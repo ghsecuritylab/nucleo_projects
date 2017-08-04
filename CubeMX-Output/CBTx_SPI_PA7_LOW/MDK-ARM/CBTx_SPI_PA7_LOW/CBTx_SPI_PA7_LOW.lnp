@@ -1,0 +1,20 @@
+--cpu Cortex-M3
+"cbtx_spi_pa7_low\stm32f1xx_hal_dma.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_flash_ex.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_flash.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_gpio.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_rcc.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_gpio_ex.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_cortex.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_rcc_ex.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_pwr.o"
+"cbtx_spi_pa7_low\system_stm32f1xx.o"
+"cbtx_spi_pa7_low\startup_stm32f103xb.o"
+"cbtx_spi_pa7_low\stm32f1xx_hal_msp.o"
+"cbtx_spi_pa7_low\main.o"
+"cbtx_spi_pa7_low\stm32f1xx_it.o"
+--library_type=microlib --strict --scatter "CBTx_SPI_PA7_LOW\CBTx_SPI_PA7_LOW.sct"
+--diag_suppress=L6329 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "CBTx_SPI_PA7_LOW.map" -o CBTx_SPI_PA7_LOW\CBTx_SPI_PA7_LOW.axf

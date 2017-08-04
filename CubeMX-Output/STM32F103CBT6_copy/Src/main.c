@@ -182,7 +182,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 		sprintf(Rrtd, "\n\r%u: \n\rRrtd = %lf\n\r", CS_Pin, resistanceRTD);
     HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
-		sprintf(Rrtd, "RAW = %lf\n\r", (float)rtd_data.rtd_res_raw);
+		sprintf(Rrtd, "\rRAW = %lf\n\r", (double)rtd_data.rtd_res_raw);
 		HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
@@ -192,7 +192,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	tmp=tmp-273.15;
 	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
 	//http://www.carelparts.com/manuals/ntc-specs.pdf page 8
-		sprintf(Trtd, "Trtd = %lf\n\r", tmp);
+		sprintf(Trtd, "\rTrtd = %lf\n\r", tmp);
     HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
 	HAL_Delay(2000);
@@ -297,11 +297,11 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  //RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
 
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  //RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  //RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
+  //RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
