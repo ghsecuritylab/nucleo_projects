@@ -38,6 +38,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_hal.h"
+#include "string.h"
 
 /* USER CODE BEGIN Includes */
 
@@ -52,7 +53,7 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0};
+uint8_t lightAllLeds [30] ={0x96, 0xDF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,0xFF,0xFF, 0, 0};
 uint8_t lightUP [28]={150, 223, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 	
 
@@ -118,13 +119,13 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-	char x[1];
-	HAL_UART_Receive(&huart1,x,1,HAL_MAX_DELAY);
-		
-	sprintf(MSG, "\rstart SPI\n\r");
-	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//	char x[1];
+//	HAL_UART_Receive(&huart1,x,1,HAL_MAX_DELAY);
+//		
+//	sprintf(MSG, "\rstart SPI\n\r");
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
 	
-	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 1);
+	HAL_SPI_Transmit(&hspi1, lightAllLeds, 30, 10);
 	//HAL_SPI_Transmit(&hspi1, 0, 1, 0);
 
   /* USER CODE BEGIN 3 */
@@ -184,10 +185,10 @@ static void MX_SPI1_Init(void)
 
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.Direction = SPI_DIRECTION_1LINE;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
