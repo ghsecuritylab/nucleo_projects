@@ -101,11 +101,19 @@ uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
 char Rrtd[30]; //array to print RTD resistance
 char Trtd[30]; //array to print RTD temperature
 char Stop[30]; //indicates all is read
+char SlaveOutput[80]; //bits from SPI slave
 
 /*ChipSelect pins and ports*/
 GPIO_TypeDef* CS_GPIO_Port[10]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port,CS9_GPIO_Port,CS10_GPIO_Port};
 uint16_t CS_Pin[10]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin,CS9_Pin,CS10_Pin};
 
+/*SPI LEDs*/
+uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF,0x20,0xFF};
+uint8_t lightNoLeds [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LEDinit [28];// ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+		char MSG[30];
+		char debug[30];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,13 +124,14 @@ static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART1_UART_Init(void);
 static GPIO_InitTypeDef  GPIO_InitStruct;
-
+void debug_array(uint8_t *LEDinit);
+	
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
-void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, uint8_t *LEDinit);
 
 /* USER CODE END PFP */
 
@@ -156,15 +165,15 @@ void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 
 /* Function to unpack and store MAX31865 data */
 
-void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, uint8_t *LEDinit)
 {
-	uint8_t read_data[8]; //variable to store the contents of the registers
+	uint8_t read_data[8]={0,0,0,0,0,0,0,0}; //variable to store the contents of the registers
 	uint8_t i = 0; //loop variable
 	
 	// Step(1): Bring the CS pin low to activate the slave device
 	CS_ENABLE(CS_GPIO_Port, CS_Pin);
 	// Step(2): Transmit config reg address telling IC that we want to 'read' and start at register 0
-	HAL_SPI_Transmit(&hspi2, &read_addr, 1, TIMEOUT_VAL);
+		HAL_SPI_Transmit(&hspi2, &read_addr, 1, TIMEOUT_VAL);
 	/* Step (3): Receive the first 8 bits (Config reg data) */
 	for(i = 0; i < 8; i++)
 	{
@@ -179,13 +188,31 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	rtd_data.LFT_val = (read_data[5] << 8) | read_data[6]; // Store LFT_val
 	rtd_data.status = read_data[7]; //Store fault status reg data	
 
+	sprintf(SlaveOutput, "\n\r0 %u\n\r1 %u\n\r2 %u\n\r3 %u\n\r4 %u\n\r5 %u\n\r6 %u\n\r7 %u\n\r", read_data[0],read_data[1],read_data[2],read_data[3],read_data[4],read_data[5],read_data[6],read_data[7]);
+    HAL_UART_Transmit(&huart1, (uint8_t *)SlaveOutput, 80, TIMEOUT_VAL);
+	
+	/*Enable LED if thermistor is connected*/
+	LED=9-LED;
+	if (rtd_data.status< 128 ||rtd_data.rtd_res_raw< 32767)
+		{
+	LEDinit[27-LED*2]= 0xFF;
+	LEDinit[26-LED*2]= 0x20;
+	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+		}
+	else if (rtd_data.status>=128||rtd_data.rtd_res_raw>= 32767)
+		{
+	LEDinit[27-LED*2]= 0;
+	LEDinit[26-LED*2]= 0;
+	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+		}
+		
   /* calculate RTD resistance */
 	//5143.92 as offset for 470k resistor
 	    resistanceRTD = /*5143.92+*/((double)rtd_data.rtd_res_raw * RREF) / 32768; // Replace 4000 by 400 for PT100
 		sprintf(Rrtd, "\n\r%u: \n\rRrtd = %lf\n\r", CS_Pin, resistanceRTD);
     HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
-		sprintf(Rrtd, "\rRAW = %lf\n\r", (double)rtd_data.rtd_res_raw);
+		sprintf(Rrtd, "RAW = %lf\n\r", (double)rtd_data.rtd_res_raw);
 		HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 30, TIMEOUT_VAL); // print RTD resistance
 	
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
@@ -195,10 +222,10 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 	tmp=tmp-273.15;
 	// http://www.giangrandi.ch/electronics/ntc/ntc.shtml
 	//http://www.carelparts.com/manuals/ntc-specs.pdf page 8
-		sprintf(Trtd, "\rTrtd = %lf\n\r", tmp);
+		sprintf(Trtd, "Trtd = %lf\n\r", tmp);
     HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
-	HAL_Delay(2000);
+	HAL_Delay(200);
 }
 
 /* USER CODE END 0 */
@@ -248,9 +275,9 @@ int main(void)
 for(int conf=0;conf< 10;conf++)
 	{
 	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
-	HAL_Delay(500);
+	HAL_Delay(50);
 
-	}	
+	}
 	// give the sensor time to set up
   HAL_Delay(1000);
   /* USER CODE END 2 */
@@ -259,30 +286,31 @@ for(int conf=0;conf< 10;conf++)
   /* USER CODE BEGIN WHILE */
 	char *msg = "Initiating Temperature measurement\n\r";
  
-  
+  uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
   while (1)
   {
   /* USER CODE END WHILE */
 		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-    HAL_Delay(200);
+    HAL_Delay(100);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(200);
+		HAL_Delay(100);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(200);
+		HAL_Delay(100);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		
 /* USER CODE BEGIN 3 */
 	for(int read= 0;read< 10;read++)
 		{
-		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read]);
+		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit);
 		
 		}
 	HAL_Delay(200);
 	sprintf(Stop, "Reading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-	HAL_Delay(2000);
+	HAL_Delay(200);
   }
   /* USER CODE END 3 */
 
