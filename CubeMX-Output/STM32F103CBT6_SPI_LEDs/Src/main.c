@@ -53,9 +53,24 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,0xFF,0xFF};
-uint8_t lightUP [28]={150, 223, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 
+int LED;
+uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF,0x20,0xFF};
+uint8_t lightNoLeds [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+uint8_t LEDinit [28];// ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LED1 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF};
+uint8_t LED2 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0};
+uint8_t LED3 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0};
+uint8_t LED4 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0};
+uint8_t LED5 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0};
+uint8_t LED6 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0,0,0};
+uint8_t LED7 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LED8 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LED9 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LED10 [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0x20,0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+	uint8_t lightUP [28]={150, 223, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 
 	
 	/* USER CODE END PV */
@@ -77,7 +92,41 @@ static void MX_SPI1_Init(void);
 
 /* USER CODE END 0 */
 char MSG[30]; //indicates all is read
+		char debug[30];
+		
+		void debug_array(uint8_t *LEDinit){
+			sprintf(debug,"\n\rarray:\t");
+			HAL_UART_Transmit(&huart1, (uint8_t *)debug, 30, 65);
 
+			for(int pos=0; pos<28;pos++)
+				{
+					sprintf(debug,"%u\t",LEDinit[pos]);
+			HAL_UART_Transmit(&huart1, (uint8_t *)debug, 30, 65);
+				}
+					sprintf(debug,"\n\r");
+			HAL_UART_Transmit(&huart1, (uint8_t *)debug, 30, 65);
+		}
+		
+		void AddOneLight(void)
+		{
+			uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+		for(LED=0;LED<10;LED++)
+			{
+		LEDinit[27-LED*2]= 0xFF;
+		LEDinit[26-LED*2]= 0x20;
+				
+		debug_array(LEDinit);
+				
+			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[27-LED*2]);
+	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+		
+		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+			HAL_Delay(1000);
+		}
+}
 int main(void)
 {
 
@@ -111,7 +160,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-	sprintf(MSG, "\rwill light up!\n\r");
+	sprintf(MSG, "\rLEDs will blink!\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
 
   /* Infinite loop */
@@ -119,15 +168,138 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-	char x[1];
-	HAL_UART_Receive(&huart1,x,1,HAL_MAX_DELAY);
+//	char x[1];
+//	HAL_UART_Receive(&huart1,x,1,HAL_MAX_DELAY);
 //		
 	sprintf(MSG, "\rstart SPI\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
 	
+		
 	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
-	//HAL_SPI_Transmit(&hspi1, 0, 1, 0);
+			HAL_Delay(1000);
 
+	HAL_SPI_Transmit(&hspi1, lightNoLeds, 28, 10);
+			HAL_Delay(1000);
+	
+	AddOneLight();
+		
+		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//	debug_array();
+//		LED=0;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0;
+//		debug_array();
+
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//		
+//		LED=1;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0;
+//			debug_array();
+
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//		
+//		LED=2;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=3;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//		
+//		LED=4;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=5;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=6;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=7;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=8;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//		
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
+//			
+//		LED=9;
+//		LEDinit[28-LED*2]= 0xFF;
+//		LEDinit[27-LED*2]= 0x20;
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//			sprintf(MSG, "\rLED nr. %i: %u\n\r", LED,LEDinit[28-LED*2]);
+//	HAL_UART_Transmit(&huart1, (uint8_t *)MSG, 30, 65);
+//				
+//		HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+//			HAL_Delay(1000);
   /* USER CODE BEGIN 3 */
 
   }

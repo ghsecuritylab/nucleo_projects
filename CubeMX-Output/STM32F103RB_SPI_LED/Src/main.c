@@ -52,8 +52,11 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,0xFF,0xFF,};
+uint8_t lightNoLeds [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
 uint8_t lightUP [28]={150, 223, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255};
 uint16_t lightAll16[14]={0x96DF, 0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF};
+uint16_t lightNone16[14]={0x96DF, 0xFFFF,0,0,0,0,0,0,0,0,0,0,0,0};
 
 /* USER CODE END PV */
 
@@ -106,7 +109,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-	sprintf(MSG, "\rwill light up!\n\r");
+	sprintf(MSG, "\rwill light up!!!!\n\r");
 	HAL_UART_Transmit(&huart2, (uint8_t *)MSG, 30, 65);
 
   /* Infinite loop */
@@ -114,15 +117,20 @@ int main(void)
   while (1)
   {
   /* USER CODE END WHILE */
-		char x[1];
-		HAL_UART_Receive(&huart2,x,1,HAL_MAX_DELAY);
+//		char x[1];
+//		HAL_UART_Receive(&huart2,x,1,HAL_MAX_DELAY);
 	
-	sprintf(MSG, "\rstart SPI\n\r");
-	HAL_UART_Transmit(&huart2, (uint8_t *)MSG, 30, 65);
+//	sprintf(MSG, "\rstart SPI\n\r");
+//	HAL_UART_Transmit(&huart2, (uint8_t *)MSG, 30, 65);
 	
-	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
-	//HAL_SPI_Transmit(&hspi1, 0, 1, 0);
-	HAL_Delay(100);
+	//HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
+		HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
+
+			HAL_Delay(1000);
+
+		HAL_SPI_Transmit(&hspi1, lightNoLeds, 28, 10);
+		HAL_Delay(1000);
+
   /* USER CODE BEGIN 3 */
 
   }
