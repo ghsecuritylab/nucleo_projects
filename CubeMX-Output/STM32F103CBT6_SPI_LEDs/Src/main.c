@@ -91,7 +91,7 @@ static void MX_SPI1_Init(void);
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-char MSG[30]; //indicates all is read
+		char MSG[30];
 		char debug[30];
 		
 		void debug_array(uint8_t *LEDinit){

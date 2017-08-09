@@ -193,16 +193,16 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 	
 	/*Enable LED if thermistor is connected*/
 	LED=9-LED;
-	if (rtd_data.status< 128 ||rtd_data.rtd_res_raw< 32767)
+	if (rtd_data.status < 128 ||rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0)
 		{
 	LEDinit[27-LED*2]= 0xFF;
 	LEDinit[26-LED*2]= 0x20;
 	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
-	else if (rtd_data.status>=128||rtd_data.rtd_res_raw>= 32767)
+	else if (rtd_data.status >= 128||rtd_data.rtd_res_raw >= 32767 && rtd_data.rtd_res_raw == 0)
 		{
-	LEDinit[27-LED*2]= 0;
-	LEDinit[26-LED*2]= 0;
+	LEDinit[27-LED*2] = 0;
+	LEDinit[26-LED*2] = 0;
 	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
 		
@@ -225,7 +225,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 		sprintf(Trtd, "Trtd = %lf\n\r", tmp);
     HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 30, TIMEOUT_VAL); // print RTD temperature
 	
-	HAL_Delay(200);
+	//HAL_Delay(200);
 }
 
 /* USER CODE END 0 */
@@ -275,7 +275,7 @@ int main(void)
 for(int conf=0;conf< 10;conf++)
 	{
 	configureSPI(CS_GPIO_Port[conf],CS_Pin[conf]);
-	HAL_Delay(50);
+	//HAL_Delay(50);
 
 	}
 	// give the sensor time to set up
@@ -287,18 +287,19 @@ for(int conf=0;conf< 10;conf++)
 	char *msg = "Initiating Temperature measurement\n\r";
  
   uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
+	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
   while (1)
   {
   /* USER CODE END WHILE */
 		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
+		
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-    HAL_Delay(100);
+    HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(100);
+		HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-		HAL_Delay(100);
+		HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		
 /* USER CODE BEGIN 3 */
@@ -307,10 +308,10 @@ for(int conf=0;conf< 10;conf++)
 		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit);
 		
 		}
-	HAL_Delay(200);
+	//HAL_Delay(200);
 	sprintf(Stop, "Reading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
-	HAL_Delay(200);
+	//HAL_Delay(200);
   }
   /* USER CODE END 3 */
 
