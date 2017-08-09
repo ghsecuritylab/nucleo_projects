@@ -288,6 +288,7 @@ for(int conf=0;conf< 10;conf++)
  
   uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
+		
   while (1)
   {
   /* USER CODE END WHILE */
