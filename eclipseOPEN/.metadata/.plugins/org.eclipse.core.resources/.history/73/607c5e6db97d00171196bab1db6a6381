@@ -123,7 +123,7 @@ uint16_t CS_Pin[10]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8
 /*SPI LEDs*/
 uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF,0x20,0xFF};
 uint8_t lightNoLeds [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-uint8_t LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint8_t LEDinit [28];// ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 		char MSG[30];
 		char debug[30];
@@ -148,7 +148,7 @@ void Read_Temperature(void *pvArgs);
 void CS_ENABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void CS_DISABLE(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
 void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin);
-void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, uint8_t *LEDinit,int CSnumber);
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int CSnumber, uint8_t *LEDinit);
 
 /* USER CODE END PFP */
 
@@ -182,7 +182,7 @@ void configureSPI(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin)
 
 /* Function to unpack and store MAX31865 data */
 
-void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, uint8_t *LEDinit,int CSnumber)
+void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int CSnumber, uint8_t *LEDinit)
 {
 	uint8_t read_data[8]={0,0,0,0,0,0,0,0}; //variable to store the contents of the registers
 	uint8_t i = 0; //loop variable
@@ -209,17 +209,17 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
     HAL_UART_Transmit(&huart1, (uint8_t *)SlaveOutput, 80, TIMEOUT_VAL);
 	
 	/*Enable LED if thermistor is connected*/
-	LED=9-LED;
+	CSnumber=9-CSnumber;
 	if (rtd_data.status < 128 ||(rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0))
 		{
-	*(LEDinit+(27-LED*2))= 0xFF;
-	*(LEDinit+(26-LED*2))= 0x20;
+	*(LEDinit+(27-CSnumber*2))= 0xFF;
+	*(LEDinit+(26-CSnumber*2))= 0x20;
 	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
 	else if (rtd_data.status >= 128||(rtd_data.rtd_res_raw >= 32767 && rtd_data.rtd_res_raw == 0))
 		{
-	*(LEDinit+(27-LED*2)) = 0;
-	*(LEDinit+(26-LED*2)) = 0;
+	*(LEDinit+(27-CSnumber*2)) = 0;
+	*(LEDinit+(26-CSnumber*2)) = 0;
 	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
 		
@@ -330,12 +330,12 @@ for(int conf=0;conf< 10;conf++)
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
-  //uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
    /* Start scheduler */
 
-  //xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
-  //xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
+  xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
+  xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
   xTaskCreate(Read_Temperature, "Read Temperature", 128, NULL, 1, NULL);
 
   vTaskStartScheduler();
@@ -362,7 +362,7 @@ for(int conf=0;conf< 10;conf++)
 /* USER CODE BEGIN 3 */
 	for(int read= 0;read< 10;read++)
 		{
-		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit,read);
+		MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit);
 		
 		}
 	//HAL_Delay(200);

@@ -1,4 +1,4 @@
-11:11:23 **** Incremental Build of configuration Debug for project SPI-LED-CAN-FreeRTOS-F103CBT6 ****
+13:06:39 **** Incremental Build of configuration Debug for project SPI-LED-CAN-FreeRTOS-F103CBT6 ****
 make all 
 Building file: ../src/main.c
 Invoking: Cross ARM GNU C Compiler
@@ -36,6 +36,6 @@ Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "SPI-LED-CAN-FreeRTOS-F103CBT6.elf"
    text	   data	    bss	    dec	    hex	filename
-  28620	    628	   4656	  33904	   8470	SPI-LED-CAN-FreeRTOS-F103CBT6.elf
+  27204	    656	   4628	  32488	   7ee8	SPI-LED-CAN-FreeRTOS-F103CBT6.elf
 Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.siz
  

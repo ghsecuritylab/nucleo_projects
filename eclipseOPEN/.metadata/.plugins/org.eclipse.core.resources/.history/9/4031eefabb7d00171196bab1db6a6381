@@ -334,8 +334,8 @@ for(int conf=0;conf< 10;conf++)
 
    /* Start scheduler */
 
-  //xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
-  //xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
+  xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
+  xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
   xTaskCreate(Read_Temperature, "Read Temperature", 128, NULL, 1, NULL);
 
   vTaskStartScheduler();
