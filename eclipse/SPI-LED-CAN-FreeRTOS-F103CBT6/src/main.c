@@ -114,6 +114,7 @@ char Rrtd[60]; //array to print RTD resistance
 char Trtd[60]; //array to print RTD temperature
 char Stop[60]; //indicates all is read
 char SlaveOutput[80]; //bits from SPI slave
+char *msg = "Initiating Temperature measurement\n\r";
 
 /*ChipSelect pins and ports*/
 GPIO_TypeDef* CS_GPIO_Port[10]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port,CS9_GPIO_Port,CS10_GPIO_Port};
@@ -140,6 +141,7 @@ static GPIO_InitTypeDef  GPIO_InitStruct;
 
 void receive_task(void *pvArgs);
 void send_task(void *pvArgs);
+void Read_Temperature(void *pvArgs);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -289,6 +291,7 @@ int main(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   /* USER CODE BEGIN 2 */
 
+	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfigure SPI2", strlen("Configure SPI2"), HAL_MAX_DELAY);
 
 for(int conf=0;conf< 10;conf++)
 	{
@@ -296,6 +299,8 @@ for(int conf=0;conf< 10;conf++)
 	//HAL_Delay(50);
 
 	}
+	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfiguration done", strlen("Configuration done"), HAL_MAX_DELAY);
+
 	// give the sensor time to set up
   	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
   	HAL_Delay(1000);
@@ -325,18 +330,20 @@ for(int conf=0;conf< 10;conf++)
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
-  /* Start scheduler */
+  uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+   /* Start scheduler */
+
   xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
   xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
+  xTaskCreate(Read_Temperature, "Read Temperature", 128, NULL, 1, NULL);
+
   vTaskStartScheduler();
 
   /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	char *msg = "Initiating Temperature measurement\n\r";
- 
-  uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
   while (1)
   {
@@ -345,7 +352,7 @@ for(int conf=0;conf< 10;conf++)
 
 
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-    HAL_Delay(50);
+		HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		HAL_Delay(50);
 		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
@@ -359,12 +366,44 @@ for(int conf=0;conf< 10;conf++)
 		
 		}
 	//HAL_Delay(200);
-	sprintf(Stop, "Reading done\n\r");
+	sprintf(Stop, "\n\rReading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 	//HAL_Delay(200);
   }
   /* USER CODE END 3 */
 
+}
+
+/*FreeRTOS function definitions*/
+
+void Read_Temperature(void *pvArgs) {
+
+
+while(1) {
+    HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
+
+
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    HAL_Delay(50);
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    HAL_Delay(50);
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+    HAL_Delay(50);
+    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
+
+/* USER CODE BEGIN 3 */
+  for(int read= 0;read< 10;read++)
+    {
+    MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit,read);
+
+    }
+
+  sprintf(Stop, "\n\rReading done\n\r");
+  HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+
+
+    vTaskDelay(pdMS_TO_TICKS(1000));
+  }
 }
 
 void receive_task(void *pvArgs) {

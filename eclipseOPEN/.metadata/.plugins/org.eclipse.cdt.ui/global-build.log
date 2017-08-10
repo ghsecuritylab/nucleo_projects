@@ -1,3 +1,41 @@
-16:31:17 **** Incremental Build of configuration Debug for project FreeRTOS ****
+11:11:23 **** Incremental Build of configuration Debug for project SPI-LED-CAN-FreeRTOS-F103CBT6 ****
 make all 
-make: Nothing to be done for `all'.
+Building file: ../src/main.c
+Invoking: Cross ARM GNU C Compiler
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -DDEBUG -DTRACE -DSTM32F103xB -I"../include" -I"../system/include" -I"../system/include/cmsis" -I"../system/include/stm32f1xx" -I"../system/include/cmsis/device" -I"../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" -I"../Middlewares/Third_Party/FreeRTOS/Source/include" -I"../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" -std=gnu11 -MMD -MP -MF"src/main.d" -MT"src/main.o" -c -o "src/main.o" "../src/main.c"
+../src/main.c: In function 'Read_Temperature':
+../src/main.c:379:29: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+ void Read_Temperature(void *pvArgs) {
+                             ^
+../src/main.c: In function 'receive_task':
+../src/main.c:409:25: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+ void receive_task(void *pvArgs) {
+                         ^
+../src/main.c: In function 'send_task':
+../src/main.c:435:22: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+ void send_task(void *pvArgs) {
+                      ^
+../src/main.c: In function '_Error_Handler':
+../src/main.c:717:29: warning: unused parameter 'file' [-Wunused-parameter]
+  void _Error_Handler(char * file, int line)
+                             ^
+../src/main.c:717:39: warning: unused parameter 'line' [-Wunused-parameter]
+  void _Error_Handler(char * file, int line)
+                                       ^
+Finished building: ../src/main.c
+ 
+Building target: SPI-LED-CAN-FreeRTOS-F103CBT6.elf
+Invoking: Cross ARM GNU C++ Linker
+arm-none-eabi-g++ -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -T mem.ld -T libs.ld -T sections.ld -nostartfiles -Xlinker --gc-sections -L"../ldscripts" -Wl,-Map,"SPI-LED-CAN-FreeRTOS-F103CBT6.map" --specs=nano.specs -u _printf_float -o "SPI-LED-CAN-FreeRTOS-F103CBT6.elf"  ./system/src/stm32f1xx/stm32f1xx_hal.o ./system/src/stm32f1xx/stm32f1xx_hal_can.o ./system/src/stm32f1xx/stm32f1xx_hal_cortex.o ./system/src/stm32f1xx/stm32f1xx_hal_dma.o ./system/src/stm32f1xx/stm32f1xx_hal_flash.o ./system/src/stm32f1xx/stm32f1xx_hal_flash_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_gpio.o ./system/src/stm32f1xx/stm32f1xx_hal_gpio_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_pwr.o ./system/src/stm32f1xx/stm32f1xx_hal_rcc.o ./system/src/stm32f1xx/stm32f1xx_hal_rcc_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_spi.o ./system/src/stm32f1xx/stm32f1xx_hal_spi_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_tim.o ./system/src/stm32f1xx/stm32f1xx_hal_tim_ex.o ./system/src/stm32f1xx/stm32f1xx_hal_uart.o  ./system/src/newlib/_cxx.o ./system/src/newlib/_exit.o ./system/src/newlib/_sbrk.o ./system/src/newlib/_startup.o ./system/src/newlib/_syscalls.o ./system/src/newlib/assert.o  ./system/src/diag/Trace.o ./system/src/diag/trace_impl.o  ./system/src/cortexm/_initialize_hardware.o ./system/src/cortexm/_reset_hardware.o ./system/src/cortexm/exception_handlers.o  ./system/src/cmsis/startup_stm32f103xb.o ./system/src/cmsis/system_stm32f1xx.o  ./src/freertos.o ./src/main.o ./src/stm32f1xx_hal_msp.o ./src/stm32f1xx_it.o  ./Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o  ./Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3/port.o  ./Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.o  ./Middlewares/Third_Party/FreeRTOS/Source/croutine.o ./Middlewares/Third_Party/FreeRTOS/Source/event_groups.o ./Middlewares/Third_Party/FreeRTOS/Source/list.o ./Middlewares/Third_Party/FreeRTOS/Source/queue.o ./Middlewares/Third_Party/FreeRTOS/Source/tasks.o ./Middlewares/Third_Party/FreeRTOS/Source/timers.o   
+Finished building target: SPI-LED-CAN-FreeRTOS-F103CBT6.elf
+ 
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "SPI-LED-CAN-FreeRTOS-F103CBT6.elf"  "SPI-LED-CAN-FreeRTOS-F103CBT6.hex"
+Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "SPI-LED-CAN-FreeRTOS-F103CBT6.elf"
+   text	   data	    bss	    dec	    hex	filename
+  28620	    628	   4656	  33904	   8470	SPI-LED-CAN-FreeRTOS-F103CBT6.elf
+Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.siz
+ 
