@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="C:\STM32Toolchain\projects\eclipse\SPI-LED-CAN-FreeRTOS-F103CBT6"/>
 		<item value="C:\STM32Toolchain\projects\eclipse\stm32-nucleof103cbt6"/>
 	</list>
 </section>
