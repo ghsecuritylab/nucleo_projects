@@ -1,27 +1,31 @@
-13:06:39 **** Incremental Build of configuration Debug for project SPI-LED-CAN-FreeRTOS-F103CBT6 ****
+14:04:55 **** Incremental Build of configuration Debug for project SPI-LED-CAN-FreeRTOS-F103CBT6 ****
 make all 
 Building file: ../src/main.c
 Invoking: Cross ARM GNU C Compiler
 arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -Og -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -ffreestanding -fno-move-loop-invariants -Wall -Wextra  -g3 -DDEBUG -DTRACE -DSTM32F103xB -I"../include" -I"../system/include" -I"../system/include/cmsis" -I"../system/include/stm32f1xx" -I"../system/include/cmsis/device" -I"../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM3" -I"../Middlewares/Third_Party/FreeRTOS/Source/include" -I"../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS" -std=gnu11 -MMD -MP -MF"src/main.d" -MT"src/main.o" -c -o "src/main.o" "../src/main.c"
 ../src/main.c: In function 'Read_Temperature':
-../src/main.c:379:29: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+../src/main.c:384:29: warning: unused parameter 'pvArgs' [-Wunused-parameter]
  void Read_Temperature(void *pvArgs) {
                              ^
 ../src/main.c: In function 'receive_task':
-../src/main.c:409:25: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+../src/main.c:415:25: warning: unused parameter 'pvArgs' [-Wunused-parameter]
  void receive_task(void *pvArgs) {
                          ^
 ../src/main.c: In function 'send_task':
-../src/main.c:435:22: warning: unused parameter 'pvArgs' [-Wunused-parameter]
+../src/main.c:441:22: warning: unused parameter 'pvArgs' [-Wunused-parameter]
  void send_task(void *pvArgs) {
                       ^
 ../src/main.c: In function '_Error_Handler':
-../src/main.c:717:29: warning: unused parameter 'file' [-Wunused-parameter]
+../src/main.c:723:29: warning: unused parameter 'file' [-Wunused-parameter]
   void _Error_Handler(char * file, int line)
                              ^
-../src/main.c:717:39: warning: unused parameter 'line' [-Wunused-parameter]
+../src/main.c:723:39: warning: unused parameter 'line' [-Wunused-parameter]
   void _Error_Handler(char * file, int line)
                                        ^
+../src/main.c: In function 'main':
+../src/main.c:380:1: warning: control reaches end of non-void function [-Wreturn-type]
+ }
+ ^
 Finished building: ../src/main.c
  
 Building target: SPI-LED-CAN-FreeRTOS-F103CBT6.elf
@@ -36,9 +40,9 @@ Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "SPI-LED-CAN-FreeRTOS-F103CBT6.elf"
    text	   data	    bss	    dec	    hex	filename
-  27204	    656	   4628	  32488	   7ee8	SPI-LED-CAN-FreeRTOS-F103CBT6.elf
+  28436	    656	   4628	  33720	   83b8	SPI-LED-CAN-FreeRTOS-F103CBT6.elf
 Finished building: SPI-LED-CAN-FreeRTOS-F103CBT6.siz
  
 
-13:06:49 Build Finished (took 9s.694ms)
+14:05:15 Build Finished (took 20s.209ms)
 

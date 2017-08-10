@@ -119,13 +119,11 @@ char *msg = "Initiating Temperature measurement\n\r";
 /*ChipSelect pins and ports*/
 GPIO_TypeDef* CS_GPIO_Port[10]={CS1_GPIO_Port, CS2_GPIO_Port,CS3_GPIO_Port,CS4_GPIO_Port,CS5_GPIO_Port,CS6_GPIO_Port,CS7_GPIO_Port,CS8_GPIO_Port,CS9_GPIO_Port,CS10_GPIO_Port};
 uint16_t CS_Pin[10]={CS1_Pin,CS2_Pin,CS3_Pin,CS4_Pin,CS5_Pin,CS6_Pin,CS7_Pin,CS8_Pin,CS9_Pin,CS10_Pin};
-uint16_t TempValues_K[10]={0,0,0,0,0,0,0,0,0,0};
 
 /*SPI LEDs*/
 uint8_t lightAllLeds [28] ={0x96, 0xDF, 0xFF, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF, 0x20, 0xFF,0x20,0xFF};
 uint8_t lightNoLeds [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 uint8_t LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-
 
 		char MSG[30];
 		char debug[30];
@@ -216,17 +214,13 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 		{
 	*(LEDinit+(27-LED*2))= 0xFF;
 	*(LEDinit+(26-LED*2))= 0x20;
-
-	//for lighting up one after another
-	//HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
 	else if (rtd_data.status >= 128||(rtd_data.rtd_res_raw >= 32767 && rtd_data.rtd_res_raw == 0))
 		{
 	*(LEDinit+(27-LED*2)) = 0;
 	*(LEDinit+(26-LED*2)) = 0;
-
-	//for lighting up one after another
-	//HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 		}
 		
   /* calculate RTD resistance */
@@ -402,10 +396,9 @@ while(1) {
     MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit,read);
 
     }
-	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	sprintf(Stop, "\n\rReading done\n\r");
-	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+  sprintf(Stop, "\n\rReading done\n\r");
+  HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
 
     vTaskDelay(pdMS_TO_TICKS(1000));
