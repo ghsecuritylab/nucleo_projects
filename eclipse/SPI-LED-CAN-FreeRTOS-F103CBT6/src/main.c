@@ -355,11 +355,10 @@ for(int conf=0;conf< 10;conf++)
   //uint8_t	LEDinit [28] ={0x96, 0xDF, 0xFF, 0xFF,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
    /* Start scheduler */
-  HAL_Delay(50);
 
   xTaskCreate(receive_task, "Receiver task", 128, NULL, 1, NULL);
   xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
-  xTaskCreate(Read_Temperature, "Read Temperature", 128, NULL, 1, NULL);
+  xTaskCreate(Read_Temperature, (signed char*)"Read Temperature", 1024, NULL, 1, NULL);
   vTaskStartScheduler();
 
   /* We should never get here as control is now taken by the scheduler */
@@ -369,8 +368,8 @@ for(int conf=0;conf< 10;conf++)
 
 
 
-   while (1)
-  {/*
+   /*while (1)
+  {
   		HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 
@@ -391,16 +390,19 @@ for(int conf=0;conf< 10;conf++)
 	sprintf(Stop, "\n\rReading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 	//HAL_Delay(200);
- */ }
+ }*/
+  return -1;
 
 }
 
 /*FreeRTOS function definitions*/
 
-void Read_Temperature(void *pvArgs) {
+xQueueHandle Global_Queue_Handle =0;
+
+void Read_Temperature(void *p) {
 
 
-while(1) {
+	for(;;) {
     HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
 
 
@@ -424,7 +426,8 @@ while(1) {
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
 	//HAL_Delay(500);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    //vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(500);
   }
 }
 
@@ -432,7 +435,7 @@ void receive_task(void *pvArgs) {
 
 	uint8_t data_holder;
 
-	while(1) {
+	for(;;) {
 
 		HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
   		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 1000) != HAL_OK) { //Try to receive
@@ -461,7 +464,7 @@ void send_task(void *pvArgs) {
 
 	hcan.pTxMsg->Data[0] = 255;
 
-	while(1) {
+	for(;;) {
 
 
 

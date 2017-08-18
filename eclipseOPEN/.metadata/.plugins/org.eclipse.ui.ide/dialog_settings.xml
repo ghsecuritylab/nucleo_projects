@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+		<item value="C:\STM32Toolchain\projects\eclipseOPEN\SPI-LED-CAN-FreeRTOS-F103CBT6"/>
 		<item value="C:\STM32Toolchain\projects\eclipse\SPI-LED-CAN-FreeRTOS-F103CBT6"/>
 		<item value="C:\STM32Toolchain\projects\eclipse\stm32-nucleof103cbt6"/>
 	</list>
+	<section name="SaveAsDialogSettings">
+		<item value="700" key="DIALOG_WIDTH"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-30|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+		<item value="635" key="DIALOG_HEIGHT"/>
+		<item value="858" key="DIALOG_X_ORIGIN"/>
+		<item value="235" key="DIALOG_Y_ORIGIN"/>
+	</section>
 </section>
