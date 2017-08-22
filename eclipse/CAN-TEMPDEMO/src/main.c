@@ -388,7 +388,7 @@ for(int conf=0;conf< 10;conf++)
   	 Global_Queue_CS = xQueueCreate(10,sizeof(unsigned int));
 
 
-  //xTaskCreate(receive_task, "Receiver task", 256, NULL, 1, NULL);
+  xTaskCreate(receive_task, "Receiver task", 256, NULL, 2, NULL);
   //TaskHandle_t TempRead;
   //xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
   xTaskCreate(Read_Temperature, "Read Temperature", 256, NULL, 1, NULL);
@@ -466,6 +466,9 @@ void Read_Temperature(void *pvArgs) {
 
 
 for(;;) {
+	//vTaskSuspendAll();
+    //taskENTER_CRITICAL();
+
 unsigned long starttime=	xTaskGetTickCount();
     /*
     HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
@@ -503,10 +506,12 @@ unsigned long starttime=	xTaskGetTickCount();
 	sprintf(Stop, "\n\rReading done\n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
-	//vTaskDelay(pdMS_TO_TICKS(17));
 unsigned long stoptime=	xTaskGetTickCount();
 sprintf(Stop, "\n\r%lu %lu\n\r",starttime, stoptime);
 					HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+
+       vTaskDelay(pdMS_TO_TICKS(100));
+
   }
 }
 
