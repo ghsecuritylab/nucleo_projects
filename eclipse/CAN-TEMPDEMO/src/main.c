@@ -224,8 +224,8 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 	rtd_data.LFT_val = (read_data[5] << 8) | read_data[6]; // Store LFT_val
 	rtd_data.status = read_data[7]; //Store fault status reg data	
 
-	sprintf(SlaveOutput, "\n\r0 %u\n\r1 %u\n\r2 %u\n\r3 %u\n\r4 %u\n\r5 %u\n\r6 %u\n\r7 %u\n\r", read_data[0],read_data[1],read_data[2],read_data[3],read_data[4],read_data[5],read_data[6],read_data[7]);
-    HAL_UART_Transmit(&huart1, (uint8_t *)SlaveOutput, 80, TIMEOUT_VAL);
+	////sprintf(SlaveOutput, "\n\r0 %u\n\r1 %u\n\r2 %u\n\r3 %u\n\r4 %u\n\r5 %u\n\r6 %u\n\r7 %u\n\r", read_data[0],read_data[1],read_data[2],read_data[3],read_data[4],read_data[5],read_data[6],read_data[7]);
+    //HAL_UART_Transmit(&huart1, (uint8_t *)SlaveOutput, 80, TIMEOUT_VAL);
 	
 	/*Enable LED if thermistor is connected*/
 	if (/*rtd_data.status >= 128||*/(rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0))
@@ -248,8 +248,8 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
   /* calculate RTD resistance */
 	//5143.92 as offset for 470k resistor
 	    resistanceRTD = /*Offset+*/((double)rtd_data.rtd_res_raw * RREF) / 32767; // Replace 4000 by 400 for PT100
-		sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw);
-		HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
+		//sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw);
+		//HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
 
 	/* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
     /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
@@ -263,8 +263,8 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 
 
 
-	sprintf(Trtd, "Trtd = %0.2f\n\r", tmp);
-    HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+	//sprintf(Trtd, "Trtd = %0.2f\n\r", tmp);
+    //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 	
     /*transferring kelvin with 2 decimals to unsigned 32 bit
      * adding the Sensor ID after as 1 byte before the data byte*/
@@ -272,30 +272,30 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
     tmp=tmp*100;
 	resistanceRTD=resistanceRTD*100;
 	ID_tmp=(unsigned short int)tmp;
-//	sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-//	HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+//	//sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+//	//HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
 	ID_tmp =ID_tmp | Sensor_ID[CSnumber];
 
-//	sprintf(Trtd, "s_ID = %i\n\r", Sensor_ID[CSnumber]);
-//	HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+//	//sprintf(Trtd, "s_ID = %i\n\r", Sensor_ID[CSnumber]);
+//	//HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
-//	sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-//	HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+//	//sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+//	//HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
 	*(TemperatureValues_K+9-CSnumber)=ID_tmp;
 	*(ResistanceValues_K+9-CSnumber)=(unsigned short int)resistanceRTD;
 
 	if(xQueueSend(Global_Queue_CS, &ID_tmp,10)){
-	   		HAL_UART_Transmit(&huart1, (uint8_t*)"Temperature in Queue\n\r", strlen("Temperature in Queue\n\r"), 0xFFFF);
+	   		//HAL_UART_Transmit(&huart1, (uint8_t*)"Temperature in Queue\n\r", strlen("Temperature in Queue\n\r"), 0xFFFF);
 	  	 }
 	  	 else{
-	    		HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to add to Queue\n\r", strlen("Failed to add to Queue\n\r"), 0xFFFF);
+	    		//HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to add to Queue\n\r", strlen("Failed to add to Queue\n\r"), 0xFFFF);
 
 	  	 }
 
-	sprintf(Trtd, "Temp in Array = %i\n\r", TemperatureValues_K[9-CSnumber]);
-	    HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+	//sprintf(Trtd, "Temp in Array = %i\n\r", TemperatureValues_K[9-CSnumber]);
+	    //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
 }
 
@@ -344,7 +344,7 @@ int main(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfigure SPI2", strlen("\n\rConfigure SPI2"), HAL_MAX_DELAY);
+	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfigure SPI2", strlen("\n\rConfigure SPI2"), HAL_MAX_DELAY);
 
 for(int conf=0;conf< 10;conf++)
 	{
@@ -352,7 +352,7 @@ for(int conf=0;conf< 10;conf++)
 	HAL_Delay(50);
 
 	}
-	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfiguration done\n\r", strlen("\n\rConfiguration done\n\r"), HAL_MAX_DELAY);
+	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\rConfiguration done\n\r", strlen("\n\rConfiguration done\n\r"), HAL_MAX_DELAY);
 
 	// give the sensor time to set up
   	HAL_SPI_Transmit(&hspi1, lightAllLeds, 28, 10);
@@ -417,13 +417,13 @@ void RecieveQueue(void *p){
 			uint8_t ID = receive >> 16;
 			TemperatureValues_K[ID-1]=receive;
 
-					sprintf(Stop,"%x\n\r",receive);
-					HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
-					HAL_UART_Transmit(&huart1, (uint8_t*)Stop, strlen("690000\n\r"), 0xFFFF);
+					//sprintf(Stop,"%x\n\r",receive);
+					//HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
+					//HAL_UART_Transmit(&huart1, (uint8_t*)Stop, strlen("690000\n\r"), 0xFFFF);
 
 		}
 				 else{
-						HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to read from Queue\n\r", strlen("Failed to read from Queue\n\r"), 0xFFFF);
+						//HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to read from Queue\n\r", strlen("Failed to read from Queue\n\r"), 0xFFFF);
 
 				  	 }
 			}
@@ -435,8 +435,8 @@ void RecieveQueue(void *p){
 								Datatest[1] = TemperatureValues_K[m] >> 16;
 								Datatest[2] = TemperatureValues_K[m] >> 8;
 								Datatest[3] = TemperatureValues_K[m];
-								sprintf(Stop,"%02X %02X %02X %02X\n\r",Datatest[0],Datatest[1],Datatest[2],Datatest[3]);
-								HAL_UART_Transmit(&huart1, (uint8_t*)Stop, 20, 0xFFFF);
+								//sprintf(Stop,"%02X %02X %02X %02X\n\r",Datatest[0],Datatest[1],Datatest[2],Datatest[3]);
+								//HAL_UART_Transmit(&huart1, (uint8_t*)Stop, 20, 0xFFFF);
 			}
 			vTaskDelay(pdMS_TO_TICKS(/*50*/15));
 		}
@@ -445,7 +445,7 @@ void RecieveQueue(void *p){
   void Blink(void *p){
    while (1)
   {
-  		HAL_UART_Transmit(&huart1, (uint8_t*)"BlINK\n\r", strlen("BlINK\n\r"), 0xFFFF);
+  		//HAL_UART_Transmit(&huart1, (uint8_t*)"BlINK\n\r", strlen("BlINK\n\r"), 0xFFFF);
 
   		HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
 		HAL_Delay(500);
@@ -472,7 +472,7 @@ for(;;) {
 
 unsigned long starttime=	xTaskGetTickCount();
     /*
-    HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
+    //HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
     HAL_Delay(5);
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
@@ -488,26 +488,26 @@ unsigned long starttime=	xTaskGetTickCount();
 	  MAX31865_full_read(CS_GPIO_Port[read],CS_Pin[read],read,LEDinit,read);
 
 	count++;
-		sprintf(Stop, "\n\rRUNS: %lu\n\r",count);
-					HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+		//sprintf(Stop, "\n\rRUNS: %lu\n\r",count);
+					//HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 	//check if light is still on
 
 //	if (*(LEDinit+(27-read*2)) == 0){
 //		while (1){
-//			sprintf(Stop, "\n\rRUNS: %lu\n\r",count);
-//			HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+//			//sprintf(Stop, "\n\rRUNS: %lu\n\r",count);
+//			//HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 //		}
 //	}
 
     }
 	HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	sprintf(Stop, "\n\rReading done\n\r");
-	HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+	//sprintf(Stop, "\n\rReading done\n\r");
+	//HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
 unsigned long stoptime=	xTaskGetTickCount();
-sprintf(Stop, "\n\r%lu %lu\n\r",starttime, stoptime);
-					HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
+//sprintf(Stop, "\n\r%lu %lu\n\r",starttime, stoptime);
+					//HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
        //vTaskDelay(pdMS_TO_TICKS(100));
 
@@ -522,16 +522,16 @@ void receive_task(void *pvArgs) {
 		HAL_StatusTypeDef TransmitReturn;
 
 		for(;;) {
-			HAL_UART_Transmit(&huart1, (uint8_t*)"IMHERE!!!", strlen("IMHERE!!!"), HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart1, (uint8_t*)"IMHERE!!!", strlen("IMHERE!!!"), HAL_MAX_DELAY);
 
 
 
 
-			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+			//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 	  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 1000) != HAL_OK) { //Try to receive
 
-	  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving START error!!", strlen("Receiving START error!!"), HAL_MAX_DELAY);
-	  			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  			//HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving START error!!", strlen("Receiving START error!!"), HAL_MAX_DELAY);
+	  			//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  		} else { //Succes!
 
@@ -552,13 +552,13 @@ void receive_task(void *pvArgs) {
 								uint8_t ID = receive >> 16;
 								TemperatureValues_K[ID-1]=receive;
 
-										sprintf(Stop,"%x\n\r",receive);
-										HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
-										HAL_UART_Transmit(&huart1, (uint8_t*)Stop, strlen("690000\n\r"), 0xFFFF);
+										//sprintf(Stop,"%x\n\r",receive);
+										//HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
+										//HAL_UART_Transmit(&huart1, (uint8_t*)Stop, strlen("690000\n\r"), 0xFFFF);
 
 							}
 							else{
-											HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to read from Queue\n\r", strlen("Failed to read from Queue\n\r"), 0xFFFF);
+											//HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to read from Queue\n\r", strlen("Failed to read from Queue\n\r"), 0xFFFF);
 
 							}
 					}
@@ -567,8 +567,8 @@ void receive_task(void *pvArgs) {
 
 	  				int m;
 
-	  				sprintf(Stop,"\n\n\r%hu %hu %hu %hu %hu %hu %hu %hu %hu %hu\n\r",TemperatureValues_K[0],TemperatureValues_K[1],TemperatureValues_K[2],TemperatureValues_K[3],TemperatureValues_K[4],TemperatureValues_K[5],TemperatureValues_K[6],TemperatureValues_K[7],TemperatureValues_K[8],TemperatureValues_K[9]);
-	  				HAL_UART_Transmit(&huart1, (uint8_t*)Stop, sizeof(Stop), 0xFFFF);
+	  				//sprintf(Stop,"\n\n\r%hu %hu %hu %hu %hu %hu %hu %hu %hu %hu\n\r",TemperatureValues_K[0],TemperatureValues_K[1],TemperatureValues_K[2],TemperatureValues_K[3],TemperatureValues_K[4],TemperatureValues_K[5],TemperatureValues_K[6],TemperatureValues_K[7],TemperatureValues_K[8],TemperatureValues_K[9]);
+	  				//HAL_UART_Transmit(&huart1, (uint8_t*)Stop, sizeof(Stop), 0xFFFF);
 
 	  				for (m = 0; m < 10; m = m + 1){
 					hcan.pTxMsg->Data[0] = 01;
@@ -588,11 +588,11 @@ void receive_task(void *pvArgs) {
 	  				hcan.pTxMsg->Data[2] = 0x01;
 	  				hcan.pTxMsg->Data[3] = m;
 */
-	  				HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  				//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 	  		  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 0) != HAL_OK) { //Try to receive
 
-	  		  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving CHECK error", strlen("Receiving CHECK error"), HAL_MAX_DELAY);
-	  		  			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  		  			//HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving CHECK error", strlen("Receiving CHECK error"), HAL_MAX_DELAY);
+	  		  			//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  		  		} else {
 	  	  			data_holder = hcan.pRxMsg->Data[0];
@@ -611,22 +611,22 @@ void receive_task(void *pvArgs) {
 
 	  				if (TransmitReturn == HAL_ERROR) { //We got an error
 	  				  	/* Transmitting Error */
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to transmit", strlen("Failed to receive"), HAL_MAX_DELAY);
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to transmit", strlen("Failed to receive"), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  				} else if((TransmitReturn == HAL_TIMEOUT)){ //Timed out
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"Timeout", strlen("Timeout"), HAL_MAX_DELAY);
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Timeout", strlen("Timeout"), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  				} else if((TransmitReturn == HAL_OK)){ //Everything worked
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"Transmitting: ", strlen("Transmitting: "), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Transmitting: ", strlen("Transmitting: "), HAL_MAX_DELAY);
 
 	  				  	data_to_send = hcan.pTxMsg->Data[3];
 
 	  				  	char trans_buff[20];
-	  				  	sprintf(trans_buff, "%i", data_to_send);
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)trans_buff, strlen(trans_buff), HAL_MAX_DELAY);
-	  				  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  				  	//sprintf(trans_buff, "%i", data_to_send);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)trans_buff, strlen(trans_buff), HAL_MAX_DELAY);
+	  				  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  				}
 	  			    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
@@ -634,10 +634,10 @@ void receive_task(void *pvArgs) {
 	  				}
 
 	  			}
-	  			//sprintf(buff, "%i", data_holder);
-	  		//	HAL_UART_Transmit(&huart1, (uint8_t*)"Receiving: ", strlen("Receiving: "), HAL_MAX_DELAY);
-	  		//	HAL_UART_Transmit(&huart1, (uint8_t*)buff, strlen(buff), HAL_MAX_DELAY);
-	  		//	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+	  			////sprintf(buff, "%i", data_holder);
+	  		//	//HAL_UART_Transmit(&huart1, (uint8_t*)"Receiving: ", strlen("Receiving: "), HAL_MAX_DELAY);
+	  		//	//HAL_UART_Transmit(&huart1, (uint8_t*)buff, strlen(buff), HAL_MAX_DELAY);
+	  		//	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  		}
 	  		vTaskDelay(pdMS_TO_TICKS(10));
@@ -659,22 +659,22 @@ void send_task(void *pvArgs) {
 
 		if (TransmitReturn == HAL_ERROR) { //We got an error
 		  	/* Transmitting Error */
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to transmit", strlen("Failed to receive"), HAL_MAX_DELAY);
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Failed to transmit", strlen("Failed to receive"), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 		} else if((TransmitReturn == HAL_TIMEOUT)){ //Timed out
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"Timeout", strlen("Timeout"), HAL_MAX_DELAY);
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Timeout", strlen("Timeout"), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 		} else if((TransmitReturn == HAL_OK)){ //Everything worked
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"Transmitting: ", strlen("Transmitting: "), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"Transmitting: ", strlen("Transmitting: "), HAL_MAX_DELAY);
 
 		  	data_to_send = hcan.pTxMsg->Data[0];
 
 		  	char trans_buff[20];
-		  	sprintf(trans_buff, "%i", data_to_send);
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)trans_buff, strlen(trans_buff), HAL_MAX_DELAY);
-		  	HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
+		  	//sprintf(trans_buff, "%i", data_to_send);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)trans_buff, strlen(trans_buff), HAL_MAX_DELAY);
+		  	//HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 		}
 
@@ -818,7 +818,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
