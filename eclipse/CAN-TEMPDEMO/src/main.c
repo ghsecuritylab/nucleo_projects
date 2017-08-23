@@ -388,10 +388,10 @@ for(int conf=0;conf< 10;conf++)
   	 Global_Queue_CS = xQueueCreate(10,sizeof(unsigned int));
 
 
-  xTaskCreate(receive_task, "Receiver task", 256, NULL, 2, NULL);
+  xTaskCreate(receive_task, "Receiver task", 256, NULL, 3, NULL);
   //TaskHandle_t TempRead;
   //xTaskCreate(send_task, "Sender task", 128, NULL, 1, NULL);
-  xTaskCreate(Read_Temperature, "Read Temperature", 256, NULL, 1, NULL);
+  xTaskCreate(Read_Temperature, "Read Temperature", 256, NULL, 3, NULL);
  // vTaskSuspend(TempRead);
   //xTaskCreate(Blink, "Blink", 128, NULL, 1, NULL);
  // xTaskCreate(RecieveQueue, "RecieveQueue", 256, NULL, 1, NULL);
@@ -473,8 +473,6 @@ for(;;) {
 unsigned long starttime=	xTaskGetTickCount();
     /*
     HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 0xFFFF);
-
-
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
     HAL_Delay(5);
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
@@ -591,7 +589,7 @@ void receive_task(void *pvArgs) {
 	  				hcan.pTxMsg->Data[3] = m;
 */
 	  				HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
-	  		  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 1) != HAL_OK) { //Try to receive
+	  		  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 0) != HAL_OK) { //Try to receive
 
 	  		  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving CHECK error", strlen("Receiving CHECK error"), HAL_MAX_DELAY);
 	  		  			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
@@ -797,7 +795,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -820,7 +818,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi2.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
