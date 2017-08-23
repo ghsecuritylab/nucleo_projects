@@ -739,7 +739,7 @@ static void MX_CAN_Init(void)
   hcan.pRxMsg = &RxMessage;
 
   hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 8;
+  hcan.Init.Prescaler = 2;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SJW = CAN_SJW_1TQ;
   hcan.Init.BS1 = CAN_BS1_2TQ;
