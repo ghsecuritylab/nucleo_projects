@@ -118,7 +118,7 @@ uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
 /*arrays to print values in for resistance and temperature*/
 char Rrtd[60]; //array to print RTD resistance
 char Trtd[60]; //array to print RTD temperature
-char Stop[60]; //indicates all is read
+char Stop[65]; //indicates all is read
 char SlaveOutput[80]; //bits from SPI slave
 char *msg = "Initiating Temperature measurement\n\r";
 
@@ -414,7 +414,8 @@ void RecieveQueue(void *p){
 			for(int read= 9;read>=0;read--){
 		if(xQueueReceive(Global_Queue_CS, &receive,10)){
 			//*(TemperatureValues_K+9-read)=receive;
-			TemperatureValues_K[9-read]=receive;
+			uint8_t ID = receive >> 16;
+			TemperatureValues_K[ID-1]=receive;
 
 					sprintf(Stop,"%x\n\r",receive);
 					HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
@@ -510,7 +511,7 @@ unsigned long stoptime=	xTaskGetTickCount();
 sprintf(Stop, "\n\r%lu %lu\n\r",starttime, stoptime);
 					HAL_UART_Transmit(&huart1, (uint8_t *)Stop, 30, TIMEOUT_VAL);
 
-       vTaskDelay(pdMS_TO_TICKS(100));
+       //vTaskDelay(pdMS_TO_TICKS(100));
 
   }
 }
@@ -531,7 +532,7 @@ void receive_task(void *pvArgs) {
 			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 	  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 1000) != HAL_OK) { //Try to receive
 
-	  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving error!!", strlen("Receiving error!!"), HAL_MAX_DELAY);
+	  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving START error!!", strlen("Receiving START error!!"), HAL_MAX_DELAY);
 	  			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  		} else { //Succes!
@@ -550,7 +551,8 @@ void receive_task(void *pvArgs) {
 					{
 							if(xQueueReceive(Global_Queue_CS, &receive,10)){
 								//*(TemperatureValues_K+9-read)=receive;
-								TemperatureValues_K[9-read]=receive;
+								uint8_t ID = receive >> 16;
+								TemperatureValues_K[ID-1]=receive;
 
 										sprintf(Stop,"%x\n\r",receive);
 										HAL_UART_Transmit(&huart1, (uint8_t*)"CS:\t", strlen("CS:\t"), 0xFFFF);
@@ -589,9 +591,9 @@ void receive_task(void *pvArgs) {
 	  				hcan.pTxMsg->Data[3] = m;
 */
 	  				HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
-	  		  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 5) != HAL_OK) { //Try to receive
+	  		  		if(HAL_CAN_Receive(&hcan, CAN_FIFO0, 1) != HAL_OK) { //Try to receive
 
-	  		  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving error", strlen("Receiving error"), HAL_MAX_DELAY);
+	  		  			HAL_UART_Transmit(&huart1, (uint8_t *)"Receiving CHECK error", strlen("Receiving CHECK error"), HAL_MAX_DELAY);
 	  		  			HAL_UART_Transmit(&huart1, (uint8_t*)"\n\r", strlen("\n\r"), HAL_MAX_DELAY);
 
 	  		  		} else {
@@ -630,7 +632,7 @@ void receive_task(void *pvArgs) {
 
 	  				}
 	  			    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_0);
-	  			  vTaskDelay(pdMS_TO_TICKS(10));
+	  			  //vTaskDelay(pdMS_TO_TICKS(20));
 	  				}
 
 	  			}
