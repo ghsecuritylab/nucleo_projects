@@ -252,21 +252,53 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 
 
   /*Enable LED if thermistor is connected*/
-	  if (/*rtd_data.status >= 128||*/(rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0))
+	  if (rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0)
 		{
 	  *(LEDinit+(27-LED*2))= 0xFF;
 	  *(LEDinit+(26-LED*2))= 0x20;
 	  //for lighting up one after another
 	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+
+	  ID_tmp=(unsigned short int)tmp;
+	  //  sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+	  //  HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 		}
-	  else if (/*rtd_data.status >= 128||*/(rtd_data.rtd_res_raw >= 32767 || rtd_data.rtd_res_raw == 0))
+
+	  else if (rtd_data.rtd_res_raw >= 32767)
 		{
 	  *(LEDinit+(27-LED*2)) = 0;
 	  *(LEDinit+(26-LED*2)) = 0;
 	  //for lighting up one after another
 	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+
+	  ID_tmp=2;
+	  //  sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+	  //  HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 		}
 
+	  else if (rtd_data.rtd_res_raw == 0)
+		{
+	  *(LEDinit+(27-LED*2)) = 0;
+	  *(LEDinit+(26-LED*2)) = 0;
+	  //for lighting up one after another
+	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+
+	  ID_tmp=1;
+	  //  sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+	  //  HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+		}
+
+	  else
+	  		{
+	  	  *(LEDinit+(27-LED*2)) = 0;
+	  	  *(LEDinit+(26-LED*2)) = 0;
+	  	  //for lighting up one after another
+	  	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+
+	  	  ID_tmp=666;
+	  	  //  sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+	  	  //  HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+	  		}
 
     sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw);
     HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
@@ -275,9 +307,6 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
     //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
 
-  ID_tmp=(unsigned short int)tmp;
-//  sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-//  HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 
   ID_tmp =ID_tmp | Sensor_ID[CSnumber];
 //sprintf(Trtd, "s_ID = %i\n\r", Sensor_ID[CSnumber]);
