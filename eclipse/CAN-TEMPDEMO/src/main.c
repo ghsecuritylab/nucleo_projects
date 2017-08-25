@@ -111,6 +111,13 @@ uint8_t read_addr = 0x00; //Read address of Configuration register
 double resistanceRTD;
 double tmp;
 unsigned int ID_tmp;
+double logRTD;
+double p2;
+double p3;
+double p4;
+double p5;
+double p6;
+
 
 /*register to initiate SPI*/
 uint8_t config_reg_write[] = {WR(REG_CONFIG), 0xC2};
@@ -229,84 +236,89 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 
   /*calculation of RESISTANCE, TEMPERATURE and TRANSFER to data design*/
 
-	  /* calculate RTD resistance */
-	  //5143.92 as offset for 470k resistor
-		resistanceRTD = /*Offset+*/((double)rtd_data.rtd_res_raw * RREF) / 32767; // Replace 4000 by 400 for PT100
+    /* calculate RTD resistance */
+    //5143.92 as offset for 470k resistor
+    resistanceRTD = /*Offset+*/((double)rtd_data.rtd_res_raw * RREF) / 32767; // Replace 4000 by 400 for PT100
 
-	  /* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
-	  /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
+    /* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
+    /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
 
-		tmp=1/(((log(/*(double)rtd_data.rtd_res_raw*/ resistanceRTD / 10000))/3435)+(1/298.15));
-		double logRTD= log10(resistanceRTD);
-		//tmp= 0.1258*pow(logRTD,6) - 3.2672*pow(logRTD,5) + 35.362*pow(logRTD,4) - 205.76*pow(logRTD,3) + 692.37*pow(logRTD,2) - 1367.9*logRTD + 1364.6+273.15;
+    //tmp=1/(((log(/*(double)rtd_data.rtd_res_raw*/ resistanceRTD / 10000))/3435)+(1/298.15));
+    //tmp=tmp-273.15; //for degrees celsius
 
-		//sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
-		//    HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
+    double logRTD= log10(resistanceRTD);
 
-	  //tmp=tmp-273.15; //for degrees celsius
-		double TemperatureC=tmp-273.15;
-	  /*sources:*/
-	  // first formula: http://www.giangrandi.ch/electronics/ntc/ntc.shtml
-	  // second formula from data: http://www.carelparts.com/manuals/ntc-specs.pdf page 8
+    p2=logRTD*logRTD;
+    p3=p2*logRTD;
+    p4=p3*logRTD;
+    p5=p4*logRTD;
+    p6=p5*logRTD;
 
-		/*transferring kelvin with 2 decimals to unsigned 32 bit
-		 * adding the Sensor ID after as 1 byte before the data byte*/
+    tmp= 0.1258*p6 - 3.2672*p5 + 35.362*p4 - 205.76*p3 + 692.37*p2 - 1367.9*logRTD + 1364.6+273.15;
 
-		tmp=tmp*100;
-		resistanceRTD=resistanceRTD*100;
+
+    /*sources:*/
+    // http://www.giangrandi.ch/electronics/ntc/ntc.shtml
+    // http://www.carelparts.com/manuals/ntc-specs.pdf page 8
+
+    /*transferring kelvin with 2 decimals to unsigned 32 bit
+     * adding the Sensor ID after as 1 byte before the data byte*/
+
+    tmp=tmp*100;
+    resistanceRTD=resistanceRTD*100;
 
 
 
   /*Enable LED if thermistor is connected*/
-	  if (rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0)
-		{
-	  *(LEDinit+(27-LED*2))= 0xFF;
-	  *(LEDinit+(26-LED*2))= 0x20;
-	  //for lighting up one after another
-	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+    if (rtd_data.rtd_res_raw < 32767 && rtd_data.rtd_res_raw > 0)
+    {
+    *(LEDinit+(27-LED*2))= 0xFF;
+    *(LEDinit+(26-LED*2))= 0x20;
+    //for lighting up one after another
+    //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	  ID_tmp=(unsigned short int)tmp;
-	  //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-	  //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
-		}
+    ID_tmp=(unsigned short int)tmp;
+    //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+    //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+    }
 
-	  else if (rtd_data.rtd_res_raw >= 32767)
-		{
-	  *(LEDinit+(27-LED*2)) = 0;
-	  *(LEDinit+(26-LED*2)) = 0;
-	  //for lighting up one after another
-	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+    else if (rtd_data.rtd_res_raw >= 32767)
+    {
+    *(LEDinit+(27-LED*2)) = 0;
+    *(LEDinit+(26-LED*2)) = 0;
+    //for lighting up one after another
+    //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	  ID_tmp=2;
-	  //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-	  //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
-		}
+    ID_tmp=2;
+    //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+    //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+    }
 
-	  else if (rtd_data.rtd_res_raw == 0)
-		{
-	  *(LEDinit+(27-LED*2)) = 0;
-	  *(LEDinit+(26-LED*2)) = 0;
-	  //for lighting up one after another
-	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+    else if (rtd_data.rtd_res_raw == 0)
+    {
+    *(LEDinit+(27-LED*2)) = 0;
+    *(LEDinit+(26-LED*2)) = 0;
+    //for lighting up one after another
+    //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	  ID_tmp=1;
-	  //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-	  //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
-		}
+    ID_tmp=1;
+    //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+    //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+    }
 
-	  else
-	  		{
-	  	  *(LEDinit+(27-LED*2)) = 0;
-	  	  *(LEDinit+(26-LED*2)) = 0;
-	  	  //for lighting up one after another
-	  	  //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
+    else
+        {
+        *(LEDinit+(27-LED*2)) = 0;
+        *(LEDinit+(26-LED*2)) = 0;
+        //for lighting up one after another
+        //HAL_SPI_Transmit(&hspi1, LEDinit, 28, 10);
 
-	  	  ID_tmp=666;
-	  	  //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
-	  	  //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
-	  		}
+        ID_tmp=666;
+        //  //sprintf(Trtd, "ID = %i\n\r", ID_tmp);
+        //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
+        }
 
-    //sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
+    //sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw);
     //HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
 
     ////sprintf(Trtd, "Trtd = %0.2f\n\r", tmp);
