@@ -236,12 +236,18 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 	  /* calculate RTD temperature (simple calc, +/- 2 deg C from -100C to 100C) */
 	  /* CALCULATION OF TEMP MUST BE ADJUSTED TO RTD  */
 
-		tmp=1/(((log(/*(double)rtd_data.rtd_res_raw*/ resistanceRTD / 10000))/3435)+(1/298.15));
-	  //tmp=tmp-273.15; //for degrees celsius
+		//tmp=1/(((log(/*(double)rtd_data.rtd_res_raw*/ resistanceRTD / 10000))/3435)+(1/298.15));
+		double logRTD= log10(resistanceRTD);
+		tmp= 0.1258*pow(logRTD,6) - 3.2672*pow(logRTD,5) + 35.362*pow(logRTD,4) - 205.76*pow(logRTD,3) + 692.37*pow(logRTD,2) - 1367.9*logRTD + 1364.6+273.15;
 
+		//sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
+		  //  HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
+
+	  //tmp=tmp-273.15; //for degrees celsius
+		double TemperatureC=tmp-273.15;
 	  /*sources:*/
-	  // http://www.giangrandi.ch/electronics/ntc/ntc.shtml
-	  // http://www.carelparts.com/manuals/ntc-specs.pdf page 8
+	  // first formula: http://www.giangrandi.ch/electronics/ntc/ntc.shtml
+	  // second formula from data: http://www.carelparts.com/manuals/ntc-specs.pdf page 8
 
 		/*transferring kelvin with 2 decimals to unsigned 32 bit
 		 * adding the Sensor ID after as 1 byte before the data byte*/
@@ -300,7 +306,7 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 	  	  //  //HAL_UART_Transmit(&huart1, (uint8_t *)Trtd, 60, TIMEOUT_VAL); // print RTD temperature
 	  		}
 
-    //sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw);
+    //sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
     //HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
 
     ////sprintf(Trtd, "Trtd = %0.2f\n\r", tmp);
@@ -787,12 +793,12 @@ static void MX_CAN_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  hcan.pTxMsg->StdId = 0x065;
+  hcan.pTxMsg->StdId = 0x068;
   hcan.pTxMsg->IDE   = CAN_ID_STD;//values defined in different hal libraries
   hcan.pTxMsg->RTR   = CAN_RTR_DATA;//values defined in different hal libraries
   hcan.pTxMsg->DLC   = 8;//1-9 // how many data frames in CAN
 
-  int filter_id = 0x00000065;
+  int filter_id = 0x00000068;
   int filter_mask = 0x1FFFFFFF;
 
   /*##-2- Configure the CAN Filter ###########################################*/
