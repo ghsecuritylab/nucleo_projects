@@ -240,8 +240,8 @@ void MAX31865_full_read(GPIO_TypeDef* CS_GPIO_Port, uint16_t CS_Pin, int LED, ui
 		double logRTD= log10(resistanceRTD);
 		tmp= 0.1258*pow(logRTD,6) - 3.2672*pow(logRTD,5) + 35.362*pow(logRTD,4) - 205.76*pow(logRTD,3) + 692.37*pow(logRTD,2) - 1367.9*logRTD + 1364.6+273.15;
 
-		//sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
-		  //  HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
+		sprintf(Rrtd, "\n\rCS%i: \n\rRrtd = %0.2f\n\rRAW = %u\n\rTMP = %0.2f\n\r", CSnumber+1, resistanceRTD,rtd_data.rtd_res_raw,tmp);
+		    HAL_UART_Transmit(&huart1, (uint8_t *)Rrtd, 60, TIMEOUT_VAL); // print RTD resistance
 
 	  //tmp=tmp-273.15; //for degrees celsius
 		double TemperatureC=tmp-273.15;
@@ -793,12 +793,12 @@ static void MX_CAN_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  hcan.pTxMsg->StdId = 0x068;
+  hcan.pTxMsg->StdId = 0x06A;
   hcan.pTxMsg->IDE   = CAN_ID_STD;//values defined in different hal libraries
   hcan.pTxMsg->RTR   = CAN_RTR_DATA;//values defined in different hal libraries
   hcan.pTxMsg->DLC   = 8;//1-9 // how many data frames in CAN
 
-  int filter_id = 0x00000068;
+  int filter_id = 0x0000006A;
   int filter_mask = 0x1FFFFFFF;
 
   /*##-2- Configure the CAN Filter ###########################################*/
